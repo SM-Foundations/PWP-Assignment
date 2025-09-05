@@ -33,7 +33,7 @@ def main_menu():
 """def admin_login():
     while True
         print("Admin Login")
-        username = input("Enter admin username: ")
+        username = input("Enter admin username: ") weeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
         password = input("Enter admin password: ")
 """
 

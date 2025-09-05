@@ -24,7 +24,7 @@ def main_menu():
         elif choice == '4':
             guest_access() 
         elif choice == '5':
-            print("Exiting the program. Goodbye!")
+            print("Exiting the program.")
             sys.exit()
         else:
             print("Invalid choice. Please try again.")

@@ -4,6 +4,7 @@ import time
 import random
 import datetime
 
+#Main Menu Function do not delete or modify this function
 def main_menu():
     while True:
         print("\nMain Menu:")
@@ -38,5 +39,11 @@ def main_menu():
 
 
 
+
+
+
+
+
+# DO NOT DELETE THE BELOW LINE OR ENTER ANYTHING BELOW THIS LINE
 if __name__ == "__main__":
     main_menu()

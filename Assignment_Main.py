@@ -29,7 +29,6 @@ def main_menu():
             sys.exit()
         else:
             print("Invalid choice. Please try again.")
-        return "Exited Main Menu" 
 
 #Miscellaneous Functions:
 
@@ -57,10 +56,13 @@ class Admin:
     def __init__(self, admin_id, name, password, contact):
         self.admin_id = admin_id
         self.name = name
-        self.password =password
+        self.password = password
         self.contact = contact
+
     def __str__(self):
         return f"Admin ID: {self.admin_id}, Name: {self.name}, Contact: {self.contact}"
+
+    @staticmethod
     def get_valid_name():
         while True:
             name = input("Enter admin name: ")
@@ -68,12 +70,16 @@ class Admin:
                 print("Invalid username. It must not contain numbers or special characters.")
                 continue
             return name
+
+    @staticmethod
     def get_valid_password():
         while True:
             password = input("Enter new password: ")
             if not password_making(password):
                 continue
             return password
+
+    @staticmethod
     def get_valid_contact():
         while True:
             contact = input("Enter contact number: ")
@@ -83,18 +89,18 @@ class Admin:
             return contact
 
 #Administrator Section:
-#Admin Login and Registration Function:
 
+#Admin Login and Registration Function:
 #Admin ID Generator Function:
 def adminID_Generator():
     if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
         with open("Admin Cred.txt", "r") as file:
             num_users = len(file.readlines())
-        new_admin_id = {num_users + 1}.zfill(5)
+        new_admin_id = str(num_users + 1).zfill(5)
     else:
         new_admin_id = "00001"
     print(f"Generated Admin ID: {new_admin_id}")
-    return {new_admin_id}
+    return new_admin_id
 
 #Admin Registration Function:
 def admin_registration():
@@ -119,9 +125,9 @@ def admin_login():
                 stored_id, stored_name, stored_password, stored_contact = line.strip().split(',')
                 if admin_id == stored_id and password == stored_password:
                     print(f"Welcome, {stored_name}!")
-                    return admin_menu(Admin(stored_id, stored_name, stored_password, stored_contact))   
-                else:
-                    print("Invalid credentials. Please try again.")
+                    admin = Admin(stored_id, stored_name, stored_password, stored_contact)
+                    return admin_menu(admin)
+        print("Invalid credentials. Please try again.")
 
 #Admin Menu Function:
 def admin_menu(admin):
@@ -132,7 +138,6 @@ def admin_menu(admin):
         print("3. Manage Repository")
         print("4. Logout")
         choice = input("Enter your choice (1-4): ")
-        
         if choice == '1':
             manage_staff()
         elif choice == '2':
@@ -142,6 +147,63 @@ def admin_menu(admin):
         elif choice == '4':
             print("Logging out.")
             break
+
+#Manage Staff Function:
+def manage_staff():
+    print("Manage Staff")
+    print("1. Staff Manaagement")
+    print("2. Admin Management")
+    print("3. Back to Admin Menu")
+    choice = input("Enter your choice (1-3): ")
+    if choice == '1':
+        print("Staff Management Selected")
+        return Staff_Manager()
+    elif choice == '2':
+        print("Admin Management Selected")
+        return Admin_Manager()
+    elif choice == '3':
+        return admin_menu()
+    else:
+        print("Invalid choice. Please try again.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #Staff Section:

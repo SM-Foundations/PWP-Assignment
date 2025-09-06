@@ -93,11 +93,19 @@ class Admin:
     @staticmethod
     def get_valid_contact():
         while True:
-            contact = input("Enter contact number: ")
-            if not re.match(r'^\d{10}$', contact):
-                print("Invalid contact number. Please enter a 10-digit number.")
-                continue
-            return contact
+            input_contact = input("Enter contact number: ")
+            if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
+                with open("Admin Cred.txt", "r") as file:
+                    for line in file:
+                        _, _, _, stored_contact = line.strip().split(',')
+                        if input_contact == stored_contact:
+                            print("Contact number already exists. Please enter a different number.")
+                            break
+                    else:
+                        if not re.match(r'^\d{10}$', input_contact):
+                            print("Invalid contact number. Please enter a 10-digit number.")
+                            continue
+                        return input_contact
         
     def verify_password(self):
         attempts = 3
@@ -109,7 +117,7 @@ class Admin:
                 attempts -= 1
                 print(f"Incorrect password. You have {attempts} attempts left.")
             if attempts == 0:
-                locked_out = datetime.datetime.now() + datetime.timedelta(seconds=5)
+                locked_out = datetime.datetime.now() + datetime.timedelta(minutes=1)
                 lockout(locked_out)
                 attempts = 3
                 return admin_menu(admin=self)
@@ -136,6 +144,7 @@ class Admin:
 def adminID_Generator():
     if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
         with open("Admin Cred.txt", "r") as file:
+            next(file)
             num_users = len(file.readlines())
         new_admin_id = str(num_users + 1).zfill(5)
     else:
@@ -144,15 +153,21 @@ def adminID_Generator():
     return new_admin_id
 
 #@Admin Registration Function:
-def admin_registration():
+def admin_registration(admin):
     print("Admin Registration")
     name = Admin.get_valid_name()
     password = Admin.get_valid_password()
     contact = Admin.get_valid_contact()
     admin_id = adminID_Generator()
-    with open("Admin Cred.txt", "a") as file:
-        file.write(f"{admin_id},{name},{password},{contact}\n")
+    with open("Admin Cred.txt", "a",newline="\n") as file:
+        file.write(f"\n{admin_id},{name},{password},{contact}")
     print(f"Admin registered successfully with ID: {admin_id}")
+    while True:
+        continue_choice = input("Do you want to register another admin? (y/n): ").lower()
+        if continue_choice == 'y':
+            return admin_registration(admin)
+        elif continue_choice == 'n':
+            return manage_admin(admin)
 
 #@Admin Login Function:
 def admin_login():
@@ -173,7 +188,7 @@ def admin_login():
             print(f"Invalid Admin ID or Password. You have {attempts-1} attempts left.")
             attempts -= 1
         if attempts == 0:
-            locked_out = datetime.datetime.now() + datetime.timedelta(seconds=5)
+            locked_out = datetime.datetime.now() + datetime.timedelta(minutes=1)
             lockout(locked_out)
             attempts = 3
             return main_menu()
@@ -188,28 +203,28 @@ def admin_menu(admin):
         print("3. Member Management")
         print("4. Repository Management")
         print("5. Logout")
-        choice = input("Enter your choice (1-4): ")
+        choice = input("Enter your choice (1-5): ")
         if choice == '1':
             if admin.verify_password():
-                return Admin_manager(admin)
+                return manage_admin(admin)
         elif choice == '2':
             if admin.verify_password():
-                return manage_members(admin)
+                return manage_staff(admin)
         elif choice == '3':
             if admin.verify_password():
-                return manage_repository(admin)
+                return manage_members(admin)
         elif choice == '4':
             if admin.verify_password():
                 return manage_repository(admin)
         elif choice == '5':
             print("Logging out.")
-            return main_menu()
+            return admin_menu(admin)
         else:
             print("Invalid choice. Please try again.")
 
 #@Admin Section:
 #@Admin Manager Menu Function:
-def Admin_manager(admin):
+def manage_admin(admin):
     while True:
         print("Administrator Management")
         print("1. Add Admin")
@@ -219,7 +234,7 @@ def Admin_manager(admin):
         choice = input("Enter your choice (1-4): ")
         if choice == '1':
             print("Add Admin")
-            return add_member()
+            return admin_registration(admin)
         elif choice == '2':
             print("View Admin")
             return view_members()
@@ -227,13 +242,13 @@ def Admin_manager(admin):
             print("Remove Admin")
             return remove_member()
         elif choice == '4':
-            return admin_menu(admin)
+            return Admin_manager(admin)
         else:
             print("Invalid choice. Please try again.")
 
 #@Staff Section:
 #@Add Staff Menu Function:
-def Admin_manager(admin):
+def manage_staff(admin):
     while True:
         print("Staff Management")
         print("1. Add Staff")
@@ -310,6 +325,26 @@ def Staff_Manager(admin):
             return admin_menu(admin)
         else:
             print("Invalid choice. Please try again.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

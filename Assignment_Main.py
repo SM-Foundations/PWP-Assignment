@@ -5,7 +5,7 @@ import re
 import random
 import datetime
 
-#Main Menu Function do not delete or modify this function
+#@Main Menu Function do not delete or modify this function
 def main_menu():
     while True:
         print("\nMain Menu:")
@@ -30,9 +30,19 @@ def main_menu():
         else:
             print("Invalid choice. Please try again.")
 
-#Miscellaneous Functions:
+#@Miscellaneous Functions:
+#lockout Function:
+def lockout(locked_out):
+    while True:
+        current_time = datetime.datetime.now()
+        remaining_time = int((locked_out - current_time).total_seconds())
+        if remaining_time <= 0:
+            break
+        print(f"Too many incorrect attempts. Please wait {remaining_time} seconds.", end='\r')
+        time.sleep(1)
+        
 
-#Password Making Function:
+#@Password Making Function:
 def password_making(password):
     if len(password) < 8:
         print("Password must be at least 8 characters long.")
@@ -46,12 +56,12 @@ def password_making(password):
     if not re.search(r'[0-9]', password):
         print("Password must contain at least one digit.")
         return False
-    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+    if not re.search(r'[!#@$%^&*(),.?":{}|<>]', password):
         print("Password must contain at least one special character.")
         return False
     return True
 
-#Admin Class:
+#@Admin Class:
 class Admin:
     def __init__(self, admin_id, name, password, contact):
         self.admin_id = admin_id
@@ -87,11 +97,41 @@ class Admin:
                 print("Invalid contact number. Please enter a 10-digit number.")
                 continue
             return contact
+        
+    def verify_password(self):
+        attempts = 3
+        while attempts > 0:
+            password = input("Re-enter password for verification: ")
+            if password == self.password:
+                return True
+            else:
+                attempts -= 1
+                print(f"Incorrect password. You have {attempts} attempts left.")
+            if attempts == 0:
+                locked_out = datetime.datetime.now() + datetime.timedelta(seconds=5)
+                lockout(locked_out)
+                attempts = 3
+                return admin_menu(admin=self)
+    
+    @staticmethod
+    def credential_verification(input_id, input_password):
+        print("Verifying credentials...")
+        if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
+            with open("Admin Cred.txt", "r") as file:
+                for line in file:
+                    stored_id, _, stored_password, _ = line.strip().split(',')
+                    if input_id == stored_id and Admin.verify_password(input_password, stored_password):
+                        return True
+        print("Invalid Admin ID or Password.")
+        return False
+    
+    
+    
 
-#Administrator Section:
+#@Administrator Section:
 
-#Admin Login and Registration Function:
-#Admin ID Generator Function:
+#@Admin Login and Registration Function:
+#@Admin ID Generator Function:
 def adminID_Generator():
     if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
         with open("Admin Cred.txt", "r") as file:
@@ -102,7 +142,7 @@ def adminID_Generator():
     print(f"Generated Admin ID: {new_admin_id}")
     return new_admin_id
 
-#Admin Registration Function:
+#@Admin Registration Function:
 def admin_registration():
     print("Admin Registration")
     name = Admin.get_valid_name()
@@ -112,97 +152,109 @@ def admin_registration():
     with open("Admin Cred.txt", "a") as file:
         file.write(f"{admin_id},{name},{password},{contact}\n")
     print(f"Admin registered successfully with ID: {admin_id}")
-    return f"Admin registered successfully with ID: {admin_id}"
 
-#Admin Login Function:
+#@Admin Login Function:
 def admin_login():
-    while True:
+    attempts = 3
+    locked_out = None  
+    while attempts > 0:
         print("Admin Login")
-        admin_id = input("Enter Admin ID: ")
-        password = input("Enter Password: ")
-        with open("Admin Cred.txt", "r") as file:
-            for line in file:
-                stored_id, stored_name, stored_password, stored_contact = line.strip().split(',')
-                if admin_id == stored_id and password == stored_password:
-                    print(f"Welcome, {stored_name}!")
-                    admin = Admin(stored_id, stored_name, stored_password, stored_contact)
-                    return admin_menu(admin)
-        print("Invalid credentials. Please try again.")
+        input_id = input("Enter Admin ID: ")
+        input_password = input("Enter Password: ")
+        if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
+            with open("Admin Cred.txt", "r") as file:
+                for line in file:
+                    stored_id, name, stored_password, contact = line.strip().split(',')
+                    if input_id == stored_id and input_password == stored_password:
+                        print(f"Welcome, {name}!")
+                        admin = Admin(stored_id, name, stored_password, contact)
+                        return admin_menu(admin)
+            print(f"Invalid Admin ID or Password. You have {attempts-1} attempts left.")
+            attempts -= 1
+        if attempts == 0:
+            locked_out = datetime.datetime.now() + datetime.timedelta(seconds=5)
+            lockout(locked_out)
+            attempts = 3
+            return main_menu()
 
-#Admin Menu Function:
+        
+
 def admin_menu(admin):
     while True:
         print("Admin Menu:")
-        print("1. Manage staff")
-        print("2. Manage Members")
-        print("3. Manage Repository")
+        print("1. Staff Management")
+        print("2. Member Management")
+        print("3. Repository Management")
         print("4. Logout")
         choice = input("Enter your choice (1-4): ")
         if choice == '1':
-            manage_staff()
+            if admin.verify_password():
+                return Staff_Manager(admin)
         elif choice == '2':
-            manage_members()
+            if admin.verify_password():
+                return manage_members(admin)
         elif choice == '3':
-            manage_repository()
+            if admin.verify_password():
+                return manage_repository(admin)
         elif choice == '4':
             print("Logging out.")
-            break
+            return main_menu()
+        else:
+            print("Invalid choice. Please try again.")
 
-#Manage Staff Function:
-def manage_staff():
-    print("Manage Staff")
-    print("1. Staff Manaagement")
-    print("2. Admin Management")
-    print("3. Back to Admin Menu")
-    choice = input("Enter your choice (1-3): ")
-    if choice == '1':
-        print("Staff Management Selected")
-        return Staff_Manager()
-    elif choice == '2':
-        print("Admin Management Selected")
-        return Admin_Manager()
-    elif choice == '3':
-        return admin_menu()
-    else:
-        print("Invalid choice. Please try again.")
+#@Manage Members Function:
+def manage_members(admin):
+    while True:
+        print("Member Management")
+        print("1. Add Member")
+        print("2. View Members")
+        print("3. Remove Member")
+        print("4. Previous Menu")
+        choice = input("Enter your choice (1-4): ")
+        if choice == '1':
+            print("Add Member Selected")
+            return add_member()
+        elif choice == '2':
+            print("View Members Selected")
+            return view_members()
+        elif choice == '3':
+            print("Remove Member Selected")
+            return remove_member()
+        elif choice == '4':
+            return admin_menu(admin)
+        else:
+            print("Invalid choice. Please try again.")
+        
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#@Manage Repository Function:
+def manage_repository():
+    print("Manage Repository - Functionality to be implemented.")
+    return "Manage Repository - Functionality to be implemented."
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#@Staff Manager Function:
+#@Staff Management Menu Function:
+def Staff_Manager(admin):
+    while True:
+        print("Staff Manager")
+        print("1. Add Staff")
+        print("2. View Staff")
+        print("3. Remove Staff")
+        print("4. Previous Menu")
+        choice = input("Enter your choice (1-4): ")
+        if choice == '1':
+            print("Add Staff Selected")
+            return add_staff()
+        elif choice == '2':
+            print("View Staff Selected")
+            return view_staff()
+        elif choice == '3':
+            print("Remove Staff Selected")
+            return remove_staff()
+        elif choice == '4':
+            return admin_menu(admin)
+        else:
+            print("Invalid choice. Please try again.")
 
 
 
@@ -232,7 +284,7 @@ def manage_staff():
 
 
 
-# DO NOT DELETE THE BELOW LINE OR ENTER ANYTHING BELOW THIS LINE UNLESS YOU ARE DELBERT #
+# DO NOT DELETE THE BELOW LINE OR ENTER ANYTHING BELOW THIS LINE UNLESS YOU ARE DELBERT #@
 def main():
     while True:
        main_menu()

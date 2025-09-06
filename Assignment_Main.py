@@ -6,7 +6,7 @@ import random
 import datetime
 import pandas as pd
 
-#@Main Menu Function do not delete or modify this function
+#@Main Menu Function do not delete or modify this function //ANCHOR : Main Menu Function:
 def main_menu():
     while True:
         print("\nMain Menu:")
@@ -31,7 +31,7 @@ def main_menu():
         else:
             print("Invalid choice. Please try again.")
 
-#@Miscellaneous Functions:
+#@Miscellaneous Functions://ANCHOR : Miscellaneous Functions:
 #lockout Function:
 def lockout(locked_out):
     while True:
@@ -42,7 +42,6 @@ def lockout(locked_out):
         print(f"Too many incorrect attempts. Please wait {remaining_time} seconds.", end='\r')
         time.sleep(1)
         
-
 #@Password Making Function:
 def password_making(password):
     if len(password) < 8:
@@ -62,7 +61,7 @@ def password_making(password):
         return False
     return True
 
-#@Admin Class:
+#@Admin Class: //ANCHOR : Admin Class:
 class Admin:
     def __init__(self, admin_id, name, password, contact):
         self.admin_id = admin_id
@@ -137,7 +136,7 @@ class Admin:
     
     
 
-#@Administrator Section:
+#@Administrator Section: //ANCHOR : Administrator Section:
 
 #@Admin Login and Registration Function:
 #@Admin ID Generator Function:
@@ -152,7 +151,7 @@ def adminID_Generator():
     print(f"Generated Admin ID: {new_admin_id}")
     return new_admin_id
 
-#@Admin Registration Function:
+#@Admin Registration Function: //ANCHOR - Admin Registration Function:
 def admin_registration(admin):
     print("Admin Registration")
     name = Admin.get_valid_name()
@@ -169,7 +168,7 @@ def admin_registration(admin):
         elif continue_choice == 'n':
             return manage_admin(admin)
 
-#@Admin Login Function:
+#@Admin Login Function: //ANCHOR - Admin Login Function:
 def admin_login():
     attempts = 3
     locked_out = None  
@@ -194,7 +193,7 @@ def admin_login():
             return main_menu()
 
         
-
+#@Admin Menu Function: //ANCHOR - Main Admin Menu Function:
 def admin_menu(admin):
     while True:
         print("Admin Menu:")
@@ -222,7 +221,7 @@ def admin_menu(admin):
         else:
             print("Invalid choice. Please try again.")
 
-#@Admin Section:
+#@Admin Section://ANCHOR : Admin Menu Function:
 #@Admin Manager Menu Function:
 def manage_admin(admin):
     while True:
@@ -246,7 +245,7 @@ def manage_admin(admin):
         else:
             print("Invalid choice. Please try again.")
 
-#@Staff Section:
+#@Staff Section://ANCHOR - (Admin) Staff Management Section:
 #@Add Staff Menu Function:
 def manage_staff(admin):
     while True:
@@ -258,20 +257,20 @@ def manage_staff(admin):
         choice = input("Enter your choice (1-4): ")
         if choice == '1':
             print("Add Staff")
-            return add_member()
+            return add_staff()
         elif choice == '2':
             print("View Staff")
-            return view_members()
+            return view_staff()
         elif choice == '3':
             print("Remove Staff")
-            return remove_member()
+            return remove_staff()
         elif choice == '4':
             return admin_menu(admin)
         else:
             print("Invalid choice. Please try again.")
 
 
-#@Member Section:
+#@Member Section: //ANCHOR - (Admin) Member Management Section:
 #@Manage Members Menu Function:
 def manage_members(admin):
     while True:
@@ -296,35 +295,34 @@ def manage_members(admin):
             print("Invalid choice. Please try again.")
         
 
-#@Manage Repository Function:
+#@Manage Repository Function: //ANCHOR - (Admin) Repository Management Section:
 def manage_repository():
-    print("Manage Repository - Functionality to be implemented.")
-    return "Manage Repository - Functionality to be implemented."
-
-
-#@Staff Manager Function:
-#@Staff Management Menu Function:
-def Staff_Manager(admin):
     while True:
-        print("Staff Manager")
-        print("1. Add Staff")
-        print("2. View Staff")
-        print("3. Remove Staff")
-        print("4. Previous Menu")
-        choice = input("Enter your choice (1-4): ")
+        print("Repository Management")
+        print("1. Add Book")
+        print("2. View Repository")
+        print("3. Remove Book")
+        print("4. View Issued Books")
+        print("5. View Returned Books")
+        print("6. Previous Menu")
+        choice = input("Enter your choice (1-6): ")
         if choice == '1':
-            print("Add Staff Selected")
-            return add_staff()
+            return add_book()
         elif choice == '2':
-            print("View Staff Selected")
-            return view_staff()
+            print("View Members")
+            return view_repo()
         elif choice == '3':
-            print("Remove Staff Selected")
-            return remove_staff()
+            print("Remove Member")
+            return remove_book()
         elif choice == '4':
+            return view_issued_books()
+        elif choice == '5':
+            return view_returned_books()
+        elif choice == '6':
             return admin_menu(admin)
         else:
             print("Invalid choice. Please try again.")
+
 
 
 

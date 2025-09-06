@@ -4,6 +4,7 @@ import time
 import re
 import random
 import datetime
+import pandas as pd
 
 #@Main Menu Function do not delete or modify this function
 def main_menu():
@@ -182,14 +183,15 @@ def admin_login():
 def admin_menu(admin):
     while True:
         print("Admin Menu:")
-        print("1. Staff Management")
-        print("2. Member Management")
-        print("3. Repository Management")
-        print("4. Logout")
+        print("1. Admin Management")
+        print("2. Staff Management")
+        print("3. Member Management")
+        print("4. Repository Management")
+        print("5. Logout")
         choice = input("Enter your choice (1-4): ")
         if choice == '1':
             if admin.verify_password():
-                return Staff_Manager(admin)
+                return Admin_manager(admin)
         elif choice == '2':
             if admin.verify_password():
                 return manage_members(admin)
@@ -197,12 +199,65 @@ def admin_menu(admin):
             if admin.verify_password():
                 return manage_repository(admin)
         elif choice == '4':
+            if admin.verify_password():
+                return manage_repository(admin)
+        elif choice == '5':
             print("Logging out.")
             return main_menu()
         else:
             print("Invalid choice. Please try again.")
 
-#@Manage Members Function:
+#@Admin Section:
+#@Admin Manager Menu Function:
+def Admin_manager(admin):
+    while True:
+        print("Administrator Management")
+        print("1. Add Admin")
+        print("2. View Admin")
+        print("3. Remove Admin")
+        print("4. Previous Menu")
+        choice = input("Enter your choice (1-4): ")
+        if choice == '1':
+            print("Add Admin")
+            return add_member()
+        elif choice == '2':
+            print("View Admin")
+            return view_members()
+        elif choice == '3':
+            print("Remove Admin")
+            return remove_member()
+        elif choice == '4':
+            return admin_menu(admin)
+        else:
+            print("Invalid choice. Please try again.")
+
+#@Staff Section:
+#@Add Staff Menu Function:
+def Admin_manager(admin):
+    while True:
+        print("Staff Management")
+        print("1. Add Staff")
+        print("2. View Staff")
+        print("3. Remove Staff")
+        print("4. Previous Menu")
+        choice = input("Enter your choice (1-4): ")
+        if choice == '1':
+            print("Add Staff")
+            return add_member()
+        elif choice == '2':
+            print("View Staff")
+            return view_members()
+        elif choice == '3':
+            print("Remove Staff")
+            return remove_member()
+        elif choice == '4':
+            return admin_menu(admin)
+        else:
+            print("Invalid choice. Please try again.")
+
+
+#@Member Section:
+#@Manage Members Menu Function:
 def manage_members(admin):
     while True:
         print("Member Management")
@@ -212,13 +267,13 @@ def manage_members(admin):
         print("4. Previous Menu")
         choice = input("Enter your choice (1-4): ")
         if choice == '1':
-            print("Add Member Selected")
+            print("Add Member")
             return add_member()
         elif choice == '2':
-            print("View Members Selected")
+            print("View Members")
             return view_members()
         elif choice == '3':
-            print("Remove Member Selected")
+            print("Remove Member")
             return remove_member()
         elif choice == '4':
             return admin_menu(admin)

@@ -1,4 +1,3 @@
-AdminID,Name,Password,Contact
-1,1,1,1
-00002,Goggins,Qwerty123!,1234567890
-00003,David,Wasd123!,0987654321
+AdminID,Name,Contact
+1,1,1
+00002,David,1234567890

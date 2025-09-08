@@ -63,11 +63,16 @@ def password_making(password):
 
 #@Admin Class: //ANCHOR : Admin Class:
 class Admin:
-    def __init__(self, admin_id, name, password, contact):
+    def __init__(self, admin_id, password, ):
         self.admin_id = admin_id
-        self.name = name
         self.password = password
-        self.contact = contact
+
+    def verify_password(stored_password, input_password):
+        if os.path.exists("Admin Password.txt") and os.path.getsize("Admin Password.txt") > 0:
+            with open("Admin Password.txt", "r") as file:
+                for line in file:
+                    stored_id, stored_password = line.strip().split(',')
+        return stored_id, stored_password == input_password
 
     def __str__(self):
         return f"Admin ID: {self.admin_id}, Name: {self.name}, Contact: {self.contact}"
@@ -96,7 +101,7 @@ class Admin:
             if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
                 with open("Admin Cred.txt", "r") as file:
                     for line in file:
-                        _, _, _, stored_contact = line.strip().split(',')
+                        _, _, stored_contact = line.strip().split(',')
                         if input_contact == stored_contact:
                             print("Contact number already exists. Please enter a different number.")
                             break
@@ -120,22 +125,21 @@ class Admin:
                 lockout(locked_out)
                 attempts = 3
                 return admin_menu(admin=self)
-    
+            
     @staticmethod
     def credential_verification(input_id, input_password):
         print("Verifying credentials...")
-        if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
-            with open("Admin Cred.txt", "r") as file:
+        if os.path.exists("Admin Password.txt") and os.path.getsize("Admin Password.txt") > 0:
+            with open("Admin Password.txt", "r") as file:
+                next(file)
                 for line in file:
-                    stored_id, _, stored_password, _ = line.strip().split(',')
-                    if input_id == stored_id and Admin.verify_password(input_password, stored_password):
+                    stored_id, stored_password = line.strip().split(',')
+                    if input_id == stored_id and input_password == stored_password:
+                        print("Credentials verified successfully.")
                         return True
         print("Invalid Admin ID or Password.")
         return False
     
-    
-    
-
 #@Administrator Section: //ANCHOR : Administrator Section:
 
 #@Admin Login and Registration Function:
@@ -158,9 +162,18 @@ def admin_registration(admin):
     password = Admin.get_valid_password()
     contact = Admin.get_valid_contact()
     admin_id = adminID_Generator()
-    with open("Admin Cred.txt", "a",newline="\n") as file:
-        file.write(f"\n{admin_id},{name},{password},{contact}")
-    print(f"Admin registered successfully with ID: {admin_id}")
+    if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
+        with open("Admin Cred.txt", "a",newline="\n") as file:
+            file.write(f"\n{admin_id},{name},{contact}")
+    if os.path.exists("Admin Password.txt") or os.path.getsize("Admin Cred.txt") == 0:
+        if os.path.getsize("Admin Password.txt") == 0:
+            with open("Admin Password.txt", "a") as file:
+                header = file.read(1)
+                if not header:
+                    file.write("AdminID,Password")
+        with open("Admin Password.txt", "a",newline="\n") as file:
+            file.write(f"\n{admin_id},{password}")
+        print(f"Password set successfully for Admin ID: {admin_id}")
     while True:
         continue_choice = input("Do you want to register another admin? (y/n): ").lower()
         if continue_choice == 'y':
@@ -176,16 +189,15 @@ def admin_login():
         print("Admin Login")
         input_id = input("Enter Admin ID: ")
         input_password = input("Enter Password: ")
-        if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
+        '''if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
             with open("Admin Cred.txt", "r") as file:
                 for line in file:
-                    stored_id, name, stored_password, contact = line.strip().split(',')
-                    if input_id == stored_id and input_password == stored_password:
-                        print(f"Welcome, {name}!")
-                        admin = Admin(stored_id, name, stored_password, contact)
-                        return admin_menu(admin)
-            print(f"Invalid Admin ID or Password. You have {attempts-1} attempts left.")
-            attempts -= 1
+                    stored_id, name, stored_password, contact = line.strip().split(',')'''
+        if Admin.credential_verification(input_id, input_password):
+            admin = Admin(input_id,input_password)
+            return admin_menu(admin)
+        print(f"Invalid Admin ID or Password. You have {attempts-1} attempts left.")
+        attempts -= 1
         if attempts == 0:
             locked_out = datetime.datetime.now() + datetime.timedelta(minutes=1)
             lockout(locked_out)
@@ -241,9 +253,15 @@ def manage_admin(admin):
             print("Remove Admin")
             return remove_member()
         elif choice == '4':
-            return Admin_manager(admin)
+            return admin_menu(admin)
         else:
             print("Invalid choice. Please try again.")
+
+#@ Add, View, Remove Admin Functions:
+def add_admin():
+    print("Add Admin Functionality Here")
+    # Implement the logic to add an admin
+    pass
 
 #@Staff Section://ANCHOR - (Admin) Staff Management Section:
 #@Add Staff Menu Function:
@@ -268,7 +286,6 @@ def manage_staff(admin):
             return admin_menu(admin)
         else:
             print("Invalid choice. Please try again.")
-
 
 #@Member Section: //ANCHOR - (Admin) Member Management Section:
 #@Manage Members Menu Function:

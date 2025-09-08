@@ -5,6 +5,7 @@ import re
 import random
 import datetime
 import pandas as pd
+import numpy as np
 
 #@Main Menu Function do not delete or modify this function //ANCHOR : Main Menu Function:
 def main_menu():
@@ -63,13 +64,14 @@ def password_making(password):
 
 #@Admin Class: //ANCHOR : Admin Class:
 class Admin:
-    def __init__(self, admin_id, password, ):
+    def __init__(self, admin_id, password, sec_phrase):
         self.admin_id = admin_id
         self.password = password
+        self.Sec_Phrase = sec_phrase
 
     def verify_password(stored_password, input_password):
         if os.path.exists("Admin Password.txt") and os.path.getsize("Admin Password.txt") > 0:
-            with open("Admin Password.txt", "r") as file:
+            with open("Admin Password.txt", "r",encoding="utf-8") as file:
                 for line in file:
                     stored_id, stored_password = line.strip().split(',')
         return stored_id, stored_password == input_password
@@ -99,7 +101,7 @@ class Admin:
         while True:
             input_contact = input("Enter contact number: ")
             if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
-                with open("Admin Cred.txt", "r") as file:
+                with open("Admin Cred.txt", "r",encoding="utf-8") as file:
                     for line in file:
                         _, _, stored_contact = line.strip().split(',')
                         if input_contact == stored_contact:
@@ -110,43 +112,62 @@ class Admin:
                             print("Invalid contact number. Please enter a 10-digit number.")
                             continue
                         return input_contact
-        
+    
     def verify_password(self):
         attempts = 3
+        security_phrase = None
         while attempts > 0:
             password = input("Re-enter password for verification: ")
-            if password == self.password:
+            input_phrase = input("Re-enter your security phrase: ")
+            if password == self.password and input_phrase == self.Sec_Phrase:
                 return True
             else:
                 attempts -= 1
-                print(f"Incorrect password. You have {attempts} attempts left.")
-            if attempts == 0:
-                locked_out = datetime.datetime.now() + datetime.timedelta(minutes=1)
-                lockout(locked_out)
-                attempts = 3
-                return admin_menu(admin=self)
+                print(f"Incorrect password or security phrase. You have {attempts} attempts left.")
+        if attempts == 0:
+            locked_out = datetime.datetime.now() + datetime.timedelta(minutes=1)
+            lockout(locked_out)
+            attempts = 3
+            return admin_menu(admin=self)
             
     @staticmethod
-    def credential_verification(input_id, input_password):
-        print("Verifying credentials...")
+    def credential_verification(input_id, input_password, sec_phrase):
         if os.path.exists("Admin Password.txt") and os.path.getsize("Admin Password.txt") > 0:
-            with open("Admin Password.txt", "r") as file:
+            with open("Admin Password.txt", "r", encoding='utf-8') as file:
                 next(file)
                 for line in file:
-                    stored_id, stored_password = line.strip().split(',')
-                    if input_id == stored_id and input_password == stored_password:
+                    stored_id, stored_password, stored_phrase = line.strip().split(',')
+                    if input_id == stored_id and input_password == stored_password and sec_phrase == stored_phrase:
                         print("Credentials verified successfully.")
                         return True
         print("Invalid Admin ID or Password.")
         return False
     
+    @staticmethod
+    def admin_table(admin):
+        try:
+            if os.path.exists("Admin Cred.txt") and os.path.exists("Admin Cred.txt") > 0:
+                with open("Admin Cred.txt", 'r', encoding="utf-8") as file:
+                    lines = file.readlines()
+                    headers = lines[0].strip().split(',')
+                    data = [
+                        line.strip().split(',')
+                        for line in lines[1:]
+                        if len(line.strip().split(',')) == len(headers)
+                    ]
+                    table = pd.DataFrame(data,columns=headers,sep="\t")
+                    print(table)
+                    return
+        except:
+            print("No Data to be displayed")
+            return manage_admin(admin)
 #@Administrator Section: //ANCHOR : Administrator Section:
 
 #@Admin Login and Registration Function:
 #@Admin ID Generator Function:
 def adminID_Generator():
     if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
-        with open("Admin Cred.txt", "r") as file:
+        with open("Admin Cred.txt", "r",encoding="utf-8") as file:
             next(file)
             num_users = len(file.readlines())
         new_admin_id = str(num_users + 1).zfill(5)
@@ -162,6 +183,7 @@ def admin_registration(admin):
     password = Admin.get_valid_password()
     contact = Admin.get_valid_contact()
     admin_id = adminID_Generator()
+    security_phrase = input("Enter a security phrase: ")
     if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
         with open("Admin Cred.txt", "a",newline="\n") as file:
             file.write(f"\n{admin_id},{name},{contact}")
@@ -170,9 +192,9 @@ def admin_registration(admin):
             with open("Admin Password.txt", "a") as file:
                 header = file.read(1)
                 if not header:
-                    file.write("AdminID,Password")
+                    file.write("AdminID,Password,Security_Question")
         with open("Admin Password.txt", "a",newline="\n") as file:
-            file.write(f"\n{admin_id},{password}")
+            file.write(f"\n{admin_id},{password},{security_phrase}")
         print(f"Password set successfully for Admin ID: {admin_id}")
     while True:
         continue_choice = input("Do you want to register another admin? (y/n): ").lower()
@@ -184,17 +206,14 @@ def admin_registration(admin):
 #@Admin Login Function: //ANCHOR - Admin Login Function:
 def admin_login():
     attempts = 3
-    locked_out = None  
+    locked_out = None 
     while attempts > 0:
         print("Admin Login")
         input_id = input("Enter Admin ID: ")
         input_password = input("Enter Password: ")
-        '''if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
-            with open("Admin Cred.txt", "r") as file:
-                for line in file:
-                    stored_id, name, stored_password, contact = line.strip().split(',')'''
-        if Admin.credential_verification(input_id, input_password):
-            admin = Admin(input_id,input_password)
+        sec_phrase = input("Enter Security Phrase: ")
+        if Admin.credential_verification(input_id, input_password, sec_phrase):
+            admin = Admin(input_id,input_password,sec_phrase)
             return admin_menu(admin)
         print(f"Invalid Admin ID or Password. You have {attempts-1} attempts left.")
         attempts -= 1
@@ -213,7 +232,8 @@ def admin_menu(admin):
         print("2. Staff Management")
         print("3. Member Management")
         print("4. Repository Management")
-        print("5. Logout")
+        print("5. Reset Password")
+        print("6. Logout")
         choice = input("Enter your choice (1-5): ")
         if choice == '1':
             if admin.verify_password():
@@ -228,6 +248,9 @@ def admin_menu(admin):
             if admin.verify_password():
                 return manage_repository(admin)
         elif choice == '5':
+            if admin.verify_password():
+                return reset_password_self(admin)
+        elif choice == '6':
             print("Logging out.")
             return admin_menu(admin)
         else:
@@ -238,30 +261,52 @@ def admin_menu(admin):
 def manage_admin(admin):
     while True:
         print("Administrator Management")
-        print("1. Add Admin")
-        print("2. View Admin")
+        print("1. View Admin")
+        print("2. Add Admin")
         print("3. Remove Admin")
-        print("4. Previous Menu")
+        print("4. Reset Password")
+        print("5. Previous Menu")
         choice = input("Enter your choice (1-4): ")
         if choice == '1':
-            print("Add Admin")
-            return admin_registration(admin)
+            return view_admin(admin)
         elif choice == '2':
-            print("View Admin")
-            return view_members()
+            return add_admin(admin)
         elif choice == '3':
-            print("Remove Admin")
-            return remove_member()
+            return remove_admins(admin)
         elif choice == '4':
+            return password_reset(admin)
+        elif choice == '5':
             return admin_menu(admin)
         else:
             print("Invalid choice. Please try again.")
 
-#@ Add, View, Remove Admin Functions:
-def add_admin():
-    print("Add Admin Functionality Here")
-    # Implement the logic to add an admin
-    pass
+#@ View, Add, Remove Admin Functions:
+def view_admin(admin):
+    while True:
+        return Admin.admin_table(admin)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def add_admin(admin):
+    while True:
+        return Admin.admin_table
+        return admin_registration
+    
+
 
 #@Staff Section://ANCHOR - (Admin) Staff Management Section:
 #@Add Staff Menu Function:

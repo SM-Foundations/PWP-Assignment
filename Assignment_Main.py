@@ -6,6 +6,7 @@ import random
 import datetime
 import pandas as pd
 import numpy as np
+import tabulate
 
 #@Main Menu Function do not delete or modify this function //ANCHOR : Main Menu Function:
 def main_menu():
@@ -144,23 +145,25 @@ class Admin:
         return False
     
     @staticmethod
-    def admin_table(admin):
+    def admin_table(data):
         try:
-            if os.path.exists("Admin Cred.txt") and os.path.exists("Admin Cred.txt") > 0:
-                with open("Admin Cred.txt", 'r', encoding="utf-8") as file:
-                    lines = file.readlines()
-                    headers = lines[0].strip().split(',')
-                    data = [
-                        line.strip().split(',')
-                        for line in lines[1:]
-                        if len(line.strip().split(',')) == len(headers)
-                    ]
-                    table = pd.DataFrame(data,columns=headers,sep="\t")
-                    print(table)
-                    return
-        except:
-            print("No Data to be displayed")
-            return manage_admin(admin)
+            with open("Admin Cred.txt", 'r', encoding="utf-8") as file:
+                lines = file.readlines()
+                headers = lines[0].strip().split(',')
+                data = [
+                    line.strip().split(',')
+                    for line in lines[1:]
+                    if len(line.strip().split(',')) == len(headers)
+                ]
+                if not data:
+                    print("No data to be displayed")
+                table = pd.DataFrame(data,columns=headers,)
+            print(tabulate.tabulate(table,headers=headers,tablefmt="grid",colalign="left"))
+        except FileNotFoundError:
+            print("Error: 'routes admin.txt' file not found.")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+
 #@Administrator Section: //ANCHOR : Administrator Section:
 
 #@Admin Login and Registration Function:
@@ -182,8 +185,8 @@ def admin_registration(admin):
     name = Admin.get_valid_name()
     password = Admin.get_valid_password()
     contact = Admin.get_valid_contact()
-    admin_id = adminID_Generator()
     security_phrase = input("Enter a security phrase: ")
+    admin_id = adminID_Generator()
     if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
         with open("Admin Cred.txt", "a",newline="\n") as file:
             file.write(f"\n{admin_id},{name},{contact}")
@@ -193,8 +196,9 @@ def admin_registration(admin):
                 header = file.read(1)
                 if not header:
                     file.write("AdminID,Password,Security_Question")
-        with open("Admin Password.txt", "a",newline="\n") as file:
-            file.write(f"\n{admin_id},{password},{security_phrase}")
+            with open("Admin Password.txt", "a",newline="\n") as file:
+                file.write(f"\n{admin_id},{password},{security_phrase}")
+        Admin.admin_table(admin)
         print(f"Password set successfully for Admin ID: {admin_id}")
     while True:
         continue_choice = input("Do you want to register another admin? (y/n): ").lower()
@@ -266,13 +270,13 @@ def manage_admin(admin):
         print("3. Remove Admin")
         print("4. Reset Password")
         print("5. Previous Menu")
-        choice = input("Enter your choice (1-4): ")
+        choice = input("Enter your choice (1-5): ")
         if choice == '1':
             return view_admin(admin)
         elif choice == '2':
             return add_admin(admin)
         elif choice == '3':
-            return remove_admins(admin)
+            return remove_admin(admin)
         elif choice == '4':
             return password_reset(admin)
         elif choice == '5':
@@ -280,31 +284,85 @@ def manage_admin(admin):
         else:
             print("Invalid choice. Please try again.")
 
-#@ View, Add, Remove Admin Functions:
+#@ View Admin Functions:
 def view_admin(admin):
     while True:
-        return Admin.admin_table(admin)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        Admin.admin_table(admin)
+        os.system('pause')
+        return manage_admin(admin)
+    
+#@ Add Admin Function:
 def add_admin(admin):
     while True:
-        return Admin.admin_table
-        return admin_registration
+        Admin.admin_table(admin)
+        return admin_registration(admin)
+        
+#@ Remove Admin Function:
+def remove_admin(admin):
+    try:
+        Admin.admin_table(admin) 
+        with open("Admin Password.txt", 'r', encoding="utf-8") as file:
+            lines = file.readlines()
+            headers = lines[0].strip().split(',')
+            admin_sec = [
+                    line.strip().split(',')
+                    for line in lines[1:]
+                    if len(line.strip().split(',')) == len(headers)
+                ] 
+        with open("Admin Cred.txt", 'r', encoding="utf-8") as file:
+            lines = file.readlines()
+            headers = lines[0].strip().split(',')
+            admin_cred = [
+                    line.strip().split(',')
+                    for line in lines[1:]
+                    if len(line.strip().split(',')) == len(headers)
+                ] 
+        selected_admin = input("\nEnter Admin ID to remove: ").strip()
+
+        admin_index = -1
+        for index, line in enumerate(admin_sec):
+            if line[0] == selected_admin:
+                admin_index = index
+        for index, line in enumerate(admin_cred):
+            if line[0] == selected_admin:
+                admin_index = index
+                break
+
+        if admin_index == -1:
+            print("No matching ID found.")
+            return
+        
+        selected_admin = admin_cred[admin_index]
+        confirm = input(f"Are you sure you want to delete this admin: {', '.join(selected_admin)}? (y/n): ").lower()
+        if confirm != 'y':
+            print("Deletion canceled.")
+            return
+        admin_cred.pop(admin_index)
+        admin_sec.pop(admin_index)
+
+        with open("Admin Cred.txt", 'w', encoding='utf-8') as file:
+            file.write(','.join(headers) + '\n')
+            for row in admin_cred:
+                file.write(','.join(row) + '\n')
+        
+        with open("Admin Password.txt", 'w', encoding='utf-8') as file:
+            file.write(','.join(headers) + '\n')
+            for row in admin_sec:
+                file.write(','.join(row) + '\n')
+        while True:
+            continue_choice = input("Do you want to register another admin? (y/n): ").lower()
+            if continue_choice == 'y':
+                return admin_registration(admin)
+            elif continue_choice == 'n':
+                return manage_admin(admin)
+
+        
+                
+            
+    except FileNotFoundError:
+        print("file not found")
+   # except Exception as e:
+       # print(f"An unexpected error occurred: {e}")
     
 
 
@@ -331,7 +389,6 @@ def manage_staff(admin):
             return admin_menu(admin)
         else:
             print("Invalid choice. Please try again.")
-
 #@Member Section: //ANCHOR - (Admin) Member Management Section:
 #@Manage Members Menu Function:
 def manage_members(admin):

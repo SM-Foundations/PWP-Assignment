@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import tabulate
 
+
 #@Main Menu Function do not delete or modify this function //ANCHOR : Main Menu Function:
 def main_menu():
     while True:
@@ -145,20 +146,22 @@ class Admin:
         return False
     
     @staticmethod
-    def admin_table(data):
+    def admin_table(admin_data):
         try:
             with open("Admin Cred.txt", 'r', encoding="utf-8") as file:
                 lines = file.readlines()
                 headers = lines[0].strip().split(',')
-                data = [
+                admin_data = [
                     line.strip().split(',')
                     for line in lines[1:]
                     if len(line.strip().split(',')) == len(headers)
                 ]
-                if not data:
+                if not admin_data:
                     print("No data to be displayed")
-                table = pd.DataFrame(data,columns=headers,)
-            print(tabulate.tabulate(table,headers=headers,tablefmt="grid",colalign="left"))
+            print(f"|{headers[0]:10} | {headers[1]:<15} | {headers[2]:<20}|")
+            print("-" * 60)
+            for row in admin_data:
+                print(f"|{row[0]:<10} | {row[1]:<15} | {row[2]:<20}|")
         except FileNotFoundError:
             print("Error: 'routes admin.txt' file not found.")
         except Exception as e:
@@ -495,6 +498,5 @@ def manage_repository():
 def main():
     while True:
        main_menu()
-
 if __name__ == "__main__":
     main()

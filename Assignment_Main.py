@@ -4,9 +4,9 @@ import time
 import re
 import random
 import datetime
-import pandas as pd
-import numpy as np
-import tabulate
+import pandas as pd #If it gives an error, use 'pip intall pandas in python temrinal'
+import numpy as np #If it gives an error, use 'pip intall numpy in python temrinal'
+import tabulate #If it gives an error, use 'pip intall tabulate in python temrinal'
 
 #@Main Menu Function do not delete or modify this function //ANCHOR : Main Menu Function:
 def main_menu():
@@ -65,10 +65,12 @@ def password_making(password):
 
 #@Admin Class: //ANCHOR : Admin Class:
 class Admin:
-    def __init__(self, admin_id, password, sec_phrase):
+    def __init__(self, admin_id, password, sec_phrase, name=None, contact=None):
         self.admin_id = admin_id
         self.password = password
         self.Sec_Phrase = sec_phrase
+        self.name = name
+        self.contact = contact
 
     def verify_password(stored_password, input_password):
         if os.path.exists("Admin Password.txt") and os.path.getsize("Admin Password.txt") > 0:
@@ -102,21 +104,28 @@ class Admin:
         while True:
             input_contact = input("Enter contact number: ")
             if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
-                with open("Admin Cred.txt", "r",encoding="utf-8") as file:
+                with open("Admin Cred.txt", "r", encoding="utf-8") as file:
+                    next(file)  # Skip header
                     for line in file:
-                        _, _, stored_contact = line.strip().split(',')
-                        if input_contact == stored_contact:
-                            print("Contact number already exists. Please enter a different number.")
-                            break
+                        parts = line.strip().split(',')
+                        if len(parts) == 3:
+                            _, _, stored_contact = parts
+                            if input_contact == stored_contact:
+                                print("Contact number already exists. Please enter a different number.")
+                                break
                     else:
                         if not re.match(r'^\d{10}$', input_contact):
                             print("Invalid contact number. Please enter a 10-digit number.")
                             continue
                         return input_contact
+            else:
+                if not re.match(r'^\d{10}$', input_contact):
+                    print("Invalid contact number. Please enter a 10-digit number.")
+                    continue
+                return input_contact
     
     def verify_password(self):
         attempts = 3
-        security_phrase = None
         while attempts > 0:
             password = input("Re-enter password for verification: ")
             input_phrase = input("Re-enter your security phrase: ")
@@ -181,31 +190,35 @@ def adminID_Generator():
 
 #@Admin Registration Function: //ANCHOR - Admin Registration Function:
 def admin_registration(admin):
-    print("Admin Registration")
-    name = Admin.get_valid_name()
-    password = Admin.get_valid_password()
-    contact = Admin.get_valid_contact()
-    security_phrase = input("Enter a security phrase: ")
-    admin_id = adminID_Generator()
-    if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
-        with open("Admin Cred.txt", "a",newline="\n") as file:
-            file.write(f"\n{admin_id},{name},{contact}")
-    if os.path.exists("Admin Password.txt") or os.path.getsize("Admin Cred.txt") == 0:
-        if os.path.getsize("Admin Password.txt") == 0:
-            with open("Admin Password.txt", "a") as file:
-                header = file.read(1)
-                if not header:
-                    file.write("AdminID,Password,Security_Question")
-            with open("Admin Password.txt", "a",newline="\n") as file:
-                file.write(f"\n{admin_id},{password},{security_phrase}")
+    try:
+        print("Admin Registration")
+        name = Admin.get_valid_name()
+        password = Admin.get_valid_password()
+        contact = Admin.get_valid_contact()
+        security_phrase = input("Enter a security phrase: ")
+        admin_id = adminID_Generator()
+        if not os.path.exists("Admin Cred.txt") or os.path.getsize("Admin Cred.txt") == 0:
+            with open("Admin Cred.txt", "a", newline="\n", encoding="utf-8") as file:
+                file.write("AdminID,Name,Contact\n")
+        with open("Admin Cred.txt", "a", newline="\n", encoding="utf-8") as file:
+            file.write(f"\n{admin_id},{name},{contact}\n")
+        if not os.path.exists("Admin Password.txt") or os.path.getsize("Admin Password.txt") == 0:
+            with open("Admin Password.txt", "a", newline="\n", encoding="utf-8") as file:
+                file.write("AdminID,Password,Security_Question\n")
+        with open("Admin Password.txt", "a", newline="\n", encoding="utf-8") as file:
+            file.write(f"\n{admin_id},{password},{security_phrase}\n")
         Admin.admin_table(admin)
-        print(f"Password set successfully for Admin ID: {admin_id}")
-    while True:
-        continue_choice = input("Do you want to register another admin? (y/n): ").lower()
-        if continue_choice == 'y':
-            return admin_registration(admin)
-        elif continue_choice == 'n':
-            return manage_admin(admin)
+        print(f"Admin account set successfully for Admin ID: {admin_id}")
+        while True:
+            continue_choice = input("Do you want to register another admin? (y/n): ").lower()
+            if continue_choice == 'y':
+                return admin_registration(admin)
+            elif continue_choice == 'n':
+                return manage_admin(admin)
+    except FileNotFoundError:
+        print("file not found")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
 
 #@Admin Login Function: //ANCHOR - Admin Login Function:
 def admin_login():
@@ -238,7 +251,7 @@ def admin_menu(admin):
         print("4. Repository Management")
         print("5. Reset Password")
         print("6. Logout")
-        choice = input("Enter your choice (1-5): ")
+        choice = input("Enter your choice (1-6): ")
         if choice == '1':
             if admin.verify_password():
                 return manage_admin(admin)
@@ -256,7 +269,7 @@ def admin_menu(admin):
                 return reset_password_self(admin)
         elif choice == '6':
             print("Logging out.")
-            return admin_menu(admin)
+            return main_menu()
         else:
             print("Invalid choice. Please try again.")
 
@@ -278,7 +291,7 @@ def manage_admin(admin):
         elif choice == '3':
             return remove_admin(admin)
         elif choice == '4':
-            return password_reset(admin)
+            return password_reset_admin(admin)
         elif choice == '5':
             return admin_menu(admin)
         else:
@@ -294,13 +307,12 @@ def view_admin(admin):
 #@ Add Admin Function:
 def add_admin(admin):
     while True:
-        Admin.admin_table(admin)
         return admin_registration(admin)
         
 #@ Remove Admin Function:
 def remove_admin(admin):
     try:
-        Admin.admin_table(admin) 
+        Admin.admin_table(admin)
         with open("Admin Password.txt", 'r', encoding="utf-8") as file:
             lines = file.readlines()
             headers = lines[0].strip().split(',')
@@ -355,89 +367,39 @@ def remove_admin(admin):
                 return admin_registration(admin)
             elif continue_choice == 'n':
                 return manage_admin(admin)
-
-        
-                
-            
     except FileNotFoundError:
         print("file not found")
-   # except Exception as e:
-       # print(f"An unexpected error occurred: {e}")
+        return manage_admin(admin)
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return manage_admin(admin)
     
+#@ Password Reset Function:
+def password_reset_admin(admin):
+    print("Password Reset")
+    print("Under Development")
+    return manage_admin(admin)
 
 
-#@Staff Section://ANCHOR - (Admin) Staff Management Section:
-#@Add Staff Menu Function:
-def manage_staff(admin):
+#@ Manage Staff Menu Function:
+def admin_menu(admin):
     while True:
         print("Staff Management")
-        print("1. Add Staff")
-        print("2. View Staff")
+        print("1. View Staff")
+        print("2. Add Staff")
         print("3. Remove Staff")
-        print("4. Previous Menu")
-        choice = input("Enter your choice (1-4): ")
+        print("4. Reset Staff Password")
+        print("5. Previous Menu")
+        choice = input("Enter your choice (1-5): ")
         if choice == '1':
-            print("Add Staff")
-            return add_staff()
+            return view_staff(admin)
         elif choice == '2':
-            print("View Staff")
-            return view_staff()
+            return add_staff(admin)
         elif choice == '3':
-            print("Remove Staff")
-            return remove_staff()
+            return remove_staff(admin)
         elif choice == '4':
-            return admin_menu(admin)
-        else:
-            print("Invalid choice. Please try again.")
-#@Member Section: //ANCHOR - (Admin) Member Management Section:
-#@Manage Members Menu Function:
-def manage_members(admin):
-    while True:
-        print("Member Management")
-        print("1. Add Member")
-        print("2. View Members")
-        print("3. Remove Member")
-        print("4. Previous Menu")
-        choice = input("Enter your choice (1-4): ")
-        if choice == '1':
-            print("Add Member")
-            return add_member()
-        elif choice == '2':
-            print("View Members")
-            return view_members()
-        elif choice == '3':
-            print("Remove Member")
-            return remove_member()
-        elif choice == '4':
-            return admin_menu(admin)
-        else:
-            print("Invalid choice. Please try again.")
-        
-
-#@Manage Repository Function: //ANCHOR - (Admin) Repository Management Section:
-def manage_repository():
-    while True:
-        print("Repository Management")
-        print("1. Add Book")
-        print("2. View Repository")
-        print("3. Remove Book")
-        print("4. View Issued Books")
-        print("5. View Returned Books")
-        print("6. Previous Menu")
-        choice = input("Enter your choice (1-6): ")
-        if choice == '1':
-            return add_book()
-        elif choice == '2':
-            print("View Members")
-            return view_repo()
-        elif choice == '3':
-            print("Remove Member")
-            return remove_book()
-        elif choice == '4':
-            return view_issued_books()
+            return password_reset_staff(admin)
         elif choice == '5':
-            return view_returned_books()
-        elif choice == '6':
             return admin_menu(admin)
         else:
             print("Invalid choice. Please try again.")
@@ -451,21 +413,7 @@ def manage_repository():
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#Staff Section:
+#@Staff Section:
 #Staff Login Function:
 
 

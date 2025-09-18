@@ -2,11 +2,7 @@ import os
 import sys
 import time
 import re
-import random
 import datetime
-import pandas as pd #If it gives an error, use 'pip intall pandas in python temrinal'
-import numpy as np #If it gives an error, use 'pip intall numpy in python temrinal'
-import tabulate #If it gives an error, use 'pip intall tabulate in python temrinal'
 
 
 #@Main Menu Function do not delete or modify this function //ANCHOR : Main Menu Function:
@@ -59,7 +55,7 @@ def password_making(password):
     if not re.search(r'[0-9]', password):
         print("Password must contain at least one digit.")
         return False
-    if not re.search(r'[!#@$%^&*(),.?":{}|<>]', password):
+    if not re.search(r'[!#@$%^&*(),.?":{}|<>-]', password):
         print("Password must contain at least one special character.")
         return False
     return True
@@ -74,11 +70,19 @@ class Admin:
         self.contact = contact
 
     def verify_password(stored_password, input_password):
-        if os.path.exists("Admin Password.txt") and os.path.getsize("Admin Password.txt") > 0:
-            with open("Admin Password.txt", "r",encoding="utf-8") as file:
-                for line in file:
-                    stored_id, stored_password = line.strip().split(',')
-        return stored_id, stored_password == input_password
+        try:
+            if os.path.exists("Admin Password.txt") and os.path.getsize("Admin Password.txt") > 0:
+                with open("Admin Password.txt", "r",encoding="utf-8") as file:
+                    next(file)
+                    for line in file:
+                        stored_id, stored_password = line.strip().split(',')
+            return stored_id, stored_password == input_password
+        except FileNotFoundError:
+            print("file not found")
+            return main_menu()
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            return main_menu()
 
     def __str__(self):
         return f"Admin ID: {self.admin_id}, Name: {self.name}, Contact: {self.contact}"
@@ -106,7 +110,7 @@ class Admin:
             input_contact = input("Enter contact number: ")
             if os.path.exists("Admin Cred.txt") and os.path.getsize("Admin Cred.txt") > 0:
                 with open("Admin Cred.txt", "r", encoding="utf-8") as file:
-                    next(file)  # Skip header
+                    next(file)
                     for line in file:
                         parts = line.strip().split(',')
                         if len(parts) == 3:
@@ -119,27 +123,29 @@ class Admin:
                             print("Invalid contact number. Please enter a 10-digit number.")
                             continue
                         return input_contact
-            else:
-                if not re.match(r'^\d{10}$', input_contact):
-                    print("Invalid contact number. Please enter a 10-digit number.")
-                    continue
-                return input_contact
     
     def verify_password(self):
-        attempts = 3
-        while attempts > 0:
-            password = input("Re-enter password for verification: ")
-            input_phrase = input("Re-enter your security phrase: ")
-            if password == self.password and input_phrase == self.Sec_Phrase:
-                return True
-            else:
-                attempts -= 1
-                print(f"Incorrect password or security phrase. You have {attempts} attempts left.")
-        if attempts == 0:
-            locked_out = datetime.datetime.now() + datetime.timedelta(minutes=1)
-            lockout(locked_out)
+        try:
             attempts = 3
-            return admin_menu(admin=self)
+            while attempts > 0:
+                password = input("Re-enter password for verification: ")
+                input_phrase = input("Re-enter your security phrase: ")
+                if password == self.password and input_phrase == self.Sec_Phrase:
+                    return True
+                else:
+                    attempts -= 1
+                    print(f"Incorrect password or security phrase. You have {attempts} attempts left.")
+            if attempts == 0:
+                locked_out = datetime.datetime.now() + datetime.timedelta(minutes=1)
+                lockout(locked_out)
+                attempts = 3
+                return admin_menu(admin=self)
+        except FileNotFoundError:
+            print("file not found")
+            return main_menu()
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            return main_menu
             
     @staticmethod
     def credential_verification(input_id, input_password, sec_phrase):
@@ -225,23 +231,30 @@ def admin_registration(admin):
 
 #@Admin Login Function: //ANCHOR - Admin Login Function:
 def admin_login():
-    attempts = 3
-    locked_out = None 
-    while attempts > 0:
-        print("Admin Login")
-        input_id = input("Enter Admin ID: ")
-        input_password = input("Enter Password: ")
-        sec_phrase = input("Enter Security Phrase: ")
-        if Admin.credential_verification(input_id, input_password, sec_phrase):
-            admin = Admin(input_id,input_password,sec_phrase)
-            return admin_menu(admin)
-        print(f"Invalid Admin ID or Password. You have {attempts-1} attempts left.")
-        attempts -= 1
-        if attempts == 0:
-            locked_out = datetime.datetime.now() + datetime.timedelta(minutes=1)
-            lockout(locked_out)
-            attempts = 3
-            return main_menu()
+    try:
+        attempts = 3
+        locked_out = None 
+        while attempts > 0:
+            print("Admin Login")
+            input_id = input("Enter Admin ID: ")
+            input_password = input("Enter Password: ")
+            sec_phrase = input("Enter Security Phrase: ")
+            if Admin.credential_verification(input_id, input_password, sec_phrase):
+                admin = Admin(input_id,input_password,sec_phrase)
+                return admin_menu(admin)
+            print(f"Invalid Admin ID or Password. You have {attempts-1} attempts left.")
+            attempts -= 1
+            if attempts == 0:
+                locked_out = datetime.datetime.now() + datetime.timedelta(minutes=1)
+                lockout(locked_out)
+                attempts = 3
+                return main_menu()
+    except FileNotFoundError:
+        print("file not found")
+        return manage_admin(admin)
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return manage_admin(admin)
 
         
 #@Admin Menu Function: //ANCHOR - Main Admin Menu Function:
@@ -286,6 +299,7 @@ def manage_admin(admin):
         print("3. Remove Admin")
         print("4. Reset Password")
         print("5. Previous Menu")
+        print('6. Logout')
         choice = input("Enter your choice (1-5): ")
         if choice == '1':
             return view_admin(admin)
@@ -297,6 +311,9 @@ def manage_admin(admin):
             return password_reset_admin(admin)
         elif choice == '5':
             return admin_menu(admin)
+        elif choice == '6':
+            print("Logging Out")
+            return main_menu()
         else:
             print("Invalid choice. Please try again.")
 
@@ -379,33 +396,66 @@ def remove_admin(admin):
     
 #@ Password Reset Function:
 def password_reset_admin(admin):
-    print("Password Reset")
-    print("Under Development")
-    return manage_admin(admin)
+    try:
+        Admin.admin_table(admin)
+        with open("Admin Password.txt", 'r', encoding="utf-8") as file:
+            lines = file.readlines()
+            headers = lines[0].strip().split(',')
+            admin_sec = [
+                    line.strip().split(',')
+                    for line in lines[1:]
+                    if len(line.strip().split(',')) == len(headers)
+                ] 
+        with open("Admin Cred.txt", 'r', encoding="utf-8") as file:
+            lines = file.readlines()
+            headers = lines[0].strip().split(',')
+            admin_cred = [
+                    line.strip().split(',')
+                    for line in lines[1:]
+                    if len(line.strip().split(',')) == len(headers)
+                ] 
+        selected_admin = input("\nEnter Admin ID to reset password: ").strip()
+
+        admin_index = -1
+        for index, line in enumerate(admin_sec):
+            if line[0] == selected_admin:
+                admin_index = index
+
+        if admin_index == -1:
+            print("No matching ID found.")
+            return
+        
+        selected_admin = admin_cred[admin_index]
+        confirm = input(f"Are you sure you want to reset password for this admin: {', '.join(selected_admin)}? (y/n): ").lower()
+        if confirm != 'y':
+            print("Password Reset Cancelled.")
+            return
+        new_password = Admin.get_valid_password()
+        new_security_phrase = input("Enter a new security phrase: ")
+        admin_sec[admin_index][1] = new_password
+        admin_sec[admin_index][2] = new_security_phrase
+        with open("Admin Password.txt", 'w', encoding='utf-8') as file:
+            file.write(','.join(headers) + '\n')
+            for row in admin_sec:
+                file.write(','.join(row) + '\n')
+        print("Password reset successfully.")
+        while True:
+            continue_choice = input("Do you want to reset another password? (y/n): ").lower()
+            if continue_choice == 'y':
+                return password_reset_admin(admin)
+            elif continue_choice == 'n':
+                return manage_admin(admin)
+            else:
+                print("Invalid choice. Please try again.")
+    except FileNotFoundError:
+        print("file not found")
+        return manage_admin(admin)
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return manage_admin(admin)
 
 
-#@ Manage Staff Menu Function:
-def admin_menu(admin):
-    while True:
-        print("Staff Management")
-        print("1. View Staff")
-        print("2. Add Staff")
-        print("3. Remove Staff")
-        print("4. Reset Staff Password")
-        print("5. Previous Menu")
-        choice = input("Enter your choice (1-5): ")
-        if choice == '1':
-            return view_staff(admin)
-        elif choice == '2':
-            return add_staff(admin)
-        elif choice == '3':
-            return remove_staff(admin)
-        elif choice == '4':
-            return password_reset_staff(admin)
-        elif choice == '5':
-            return admin_menu(admin)
-        else:
-            print("Invalid choice. Please try again.")
+#//ANCHOR - Staff Management Section:
 
 
 

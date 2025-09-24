@@ -362,13 +362,13 @@ def remove_admin(admin):
 
         if admin_index == -1:
             print("No matching ID found.")
-            return
+            return manage_admin(admin)
         
         selected_admin = admin_cred[admin_index]
         confirm = input(f"Are you sure you want to delete this admin: {', '.join(selected_admin)}? (y/n): ").lower()
         if confirm != 'y':
             print("Deletion canceled.")
-            return
+            return manage_admin(admin)
         admin_cred.pop(admin_index)
         admin_sec.pop(admin_index)
 
@@ -423,13 +423,13 @@ def password_reset_admin(admin):
 
         if admin_index == -1:
             print("No matching ID found.")
-            return
+            return manage_admin(admin)
         
         selected_admin = admin_cred[admin_index]
         confirm = input(f"Are you sure you want to reset password for this admin: {', '.join(selected_admin)}? (y/n): ").lower()
         if confirm != 'y':
             print("Password Reset Cancelled.")
-            return
+            return manage_admin(admin)
         new_password = Admin.get_valid_password()
         new_security_phrase = input("Enter a new security phrase: ")
         admin_sec[admin_index][1] = new_password

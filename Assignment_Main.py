@@ -1,7 +1,5 @@
 import os
-import sys
 import time
-import re
 import datetime
 
 #@ File Handling:
@@ -32,7 +30,7 @@ def main_menu():
             guest_access()
         elif choice == '5':
             print("Exiting the program.")
-            sys.exit()
+            break
         else:
             print("Invalid choice. Please try again.")
 
@@ -49,19 +47,20 @@ def lockout(locked_out):
         
 #@Password Making Function:
 def password_making(password):
+    special_characters = ["!","#","$","%","^","&","*","(",")",",",".","?","\"",":","{","}","|","<",">","-"]
     if len(password) < 8:
         print("Password must be at least 8 characters long.")
         return False
-    if not re.search(r'[A-Z]', password):
+    if not any(char.isupper() for char in password):
         print("Password must contain at least one uppercase letter.")
         return False
-    if not re.search(r'[a-z]', password):
+    if not any(char.islower() for char in password):
         print("Password must contain at least one lowercase letter.")
         return False
-    if not re.search(r'[0-9]', password):
+    if not any(char.isdigit() for char in password):
         print("Password must contain at least one digit.")
         return False
-    if not re.search(r'[!#@$%^&*(),.?":{}|<>-]', password):
+    if not any(char in special_characters for char in password):
         print("Password must contain at least one special character.")
         return False
     return True

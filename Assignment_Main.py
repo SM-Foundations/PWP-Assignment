@@ -96,7 +96,7 @@ def get_valid_contact(cred_files=None):
         if exists:
             print("Contact number already exists. Please enter a different number.")
             continue
-        if not re.match(r'^\d{10}$', input_contact):
+        if len(input_contact) != 10 or not input_contact.isdigit():
             print("Invalid contact number. Please enter a 10-digit number.")
             continue
         return input_contact

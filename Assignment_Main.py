@@ -127,22 +127,27 @@ def verify_password(stored_id, input_password):
         print(f"An unexpected error occurred: {e}")
         return False
 
-def verify_password(self):
+def reverify_password(admin):
     try:
         attempts = 3
-        while attempts > 0:
-            password = input("Re-enter password for verification: ")
-            input_phrase = input("Re-enter your security phrase: ")
-            if password == self.password and input_phrase == self.Sec_Phrase:
-                return True
-            else:
-                attempts -= 1
-                print(f"Incorrect password or security phrase. You have {attempts} attempts left.")
-        if attempts == 0:
-            locked_out = datetime.datetime.now() + datetime.timedelta(minutes=1)
-            lockout(locked_out)
-            attempts = 3
-            return admin_menu(admin=self)
+        if os.path.exists(admin_file_P) and os.path.getsize(admin_file_P) > 0:
+            with open(admin_file_P, "r", encoding="utf-8") as file:
+                next(file)
+                for line in file:
+                    _, stored_password, Sec_Phrase = line.strip().split(',')
+                    while attempts > 0:
+                        input_password = input("Re-enter password for verification: ")
+                        input_phrase = input("Re-enter your security phrase: ")
+                        if input_password == stored_password and input_phrase == Sec_Phrase:
+                            return True
+                        else:
+                            attempts -= 1
+                            print(f"Incorrect password or security phrase. You have {attempts} attempts left.")
+            if attempts == 0:
+                locked_out = datetime.datetime.now() + datetime.timedelta(minutes=1)
+                lockout(locked_out)
+                attempts = 3
+                return admin_menu(admin)
     except Exception as e:
         print(f"An unexpected error occurred during password verification: {e}")
         return False
@@ -430,10 +435,22 @@ def member_id_generator():
     print(f"Generated Member ID: {new_member_id}")
     return new_member_id
 
+#@View Member Logs Function:
+def view_member_logs(admin):
+    while True:
+        print("View Member Logs - Functionality to be implemented")
+        input("Press Enter to continue...")
+        return manage_members(admin)
 
-#@Administrator Section: //ANCHOR : Administrator Section:
 
-#@Admin Login Function: //ANCHOR - Admin Login Function:
+
+
+#@ Repository Management Function:
+
+
+#@ Administrator Section: //ANCHOR : Administrator Section:
+
+#@ Admin Login Function: //ANCHOR - Admin Login Function:
 def admin_login():
     try:
         attempts = 3
@@ -473,19 +490,19 @@ def admin_menu(admin):
         print("6. Logout")
         choice = input("Enter your choice (1-6): ")
         if choice == '1':
-            if verify_password():
+            if reverify_password(admin):
                 return manage_admin(admin)
         elif choice == '2':
-            if verify_password():
+            if reverify_password(admin):
                 return manage_staff(admin)
         elif choice == '3':
-            if verify_password():
+            if reverify_password(admin):
                 return manage_members(admin)
         elif choice == '4':
-            if verify_password():
+            if reverify_password(admin):
                 return manage_repository(admin)
         elif choice == '5':
-            if verify_password():
+            if reverify_password(admin):
                 return reset_password_self(admin)
         elif choice == '6':
             print("Logging out.")
@@ -493,7 +510,9 @@ def admin_menu(admin):
         else:
             print("Invalid choice. Please try again.")
 
+######################################################
 #@Admin Section://ANCHOR : Admin Menu Function:
+######################################################
 #@Admin Manager Menu Function:
 def manage_admin(admin):
     while True:
@@ -594,7 +613,7 @@ def remove_admin(admin):
         for index, line in enumerate(admin_sec):
             if line[0] == selected_admin:
                 admin_index = index
-        if selected_lower().strip() == 'cancel':
+        if selected_admin.strip() == 'cancel':
             print("Reset canceled.")
             return manage_admin(admin)
         if admin_index == -1:
@@ -679,7 +698,9 @@ def password_reset_admin(admin):
                     else:
                         print("Invalid choice. Please try again.")
 
+###########################################
 #ANCHOR - Staff Management Section:
+###########################################
 
 def manage_staff(admin):
     while True:
@@ -892,8 +913,27 @@ def manage_members(admin):
         else:
             print("Invalid choice. Please try again.")
 
-
-
+#@ Repository Management Function:
+def manage_repository(admin):
+    while True:
+        print("Repository Management")
+        print("1. View Repository")
+        print("2. Add Repository")
+        print("3. Remove Repository")
+        print("4. Previous Menu")
+        print("5. Logout")
+        choice = input("Enter your choice (1-5): ")
+        if choice == '1':
+            return view_repository()
+        elif choice == '2':
+            return add_repository(admin)
+        elif choice == '3':
+            return remove_repository(admin)
+        elif choice == '4':
+            return admin_menu(admin)
+        elif choice == '5':
+            print("Logging Out")
+            return main_menu()
 
 
 

@@ -47,7 +47,7 @@ def lockout(locked_out):
         
 #@Password Making Function:
 def password_making(password):
-    special_characters = ["!","#","$","%","^","&","*","(",")",",",".","?","\"",":","{","}","|","<",">","-"]
+    special_characters = ["!","@","#","$","%","^","&","*","(",")",",",".","?","\"",":","{","}","|","<",">","-"]
     if len(password) < 8:
         print("Password must be at least 8 characters long.")
         return False
@@ -293,7 +293,7 @@ def add_member():
             if continue_choice == 'y':
                 return add_member()
             elif continue_choice == 'n':
-                return manage_members()
+                return
     except FileNotFoundError:
         print("Error: Member credential file not found. Please contact system administrator.")
     except Exception as e:
@@ -366,7 +366,7 @@ def remove_member():
 #@Password Reset Member Function:
 def password_reset_member():
     while True:
-        view_members()
+        member_table()
         with open(member_file_P, 'r', encoding="utf-8") as file:
             lines = file.readlines()
             headers = lines[0].strip().split(',')
@@ -390,7 +390,7 @@ def password_reset_member():
                     member_index = index
             if selected_member == 'cancel':
                 print("Reset canceled.")
-                return manage_members()
+                return
             if member_index == -1:
                 print("No matching ID found.")
             else:
@@ -398,7 +398,7 @@ def password_reset_member():
                 confirm = input(f"Are you sure you want to reset password for this member: {', '.join(selected_member)}? (y/n): ").lower()
                 if confirm != 'y':
                     print("Password Reset Cancelled.")
-                    return manage_members()
+                    return
                 new_password = get_valid_password()
                 new_security_phrase = input("Enter a new security phrase: ")
                 member_sec[member_index][1] = new_password
@@ -413,15 +413,15 @@ def password_reset_member():
                     if continue_choice == 'y':
                         return password_reset_member()
                     elif continue_choice == 'n':
-                        return manage_members()
+                        return 
                     else:
                         print("Invalid choice. Please try again.")
 
-def view_members(admin):
+def view_members():
     while True:
         member_table()
         input("Press Enter to continue...")
-        return manage_members(admin)
+        return 
     
 #@Member ID Generator Function:
 def member_id_generator():
@@ -436,11 +436,11 @@ def member_id_generator():
     return new_member_id
 
 #@View Member Logs Function:
-def view_member_logs(admin):
+def view_member_logs():
     while True:
         print("View Member Logs - Functionality to be implemented")
         input("Press Enter to continue...")
-        return manage_members(admin)
+        return manage_members()
 
 
 
@@ -896,15 +896,15 @@ def manage_members(admin):
         print('7. Logout')
         choice = input("Enter your choice (1-7): ")
         if choice == '1':
-            return view_members(admin)
+            view_members()
         elif choice == '2':
-            return view_member_logs(admin)
+            view_member_logs()
         elif choice == '3':
-            return add_member(admin)
+            add_member()
         elif choice == '4':
-            return remove_member(admin)
+            remove_member()
         elif choice == '5':
-            return password_reset_member(admin)
+            password_reset_member()
         elif choice == '6':
             return admin_menu(admin)
         elif choice == '7':

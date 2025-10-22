@@ -286,12 +286,12 @@ def add_member():
                 file.write("MemberID,Password,Security_Question\n")
         with open(member_file_P, "a", newline="\n", encoding="utf-8") as file:
             file.write(f"{member_id},{password},{security_phrase}\n")
-        view_members()
+        member_table()
         print(f"Member account set successfully for Member ID: {member_id}")
         while True:
             continue_choice = input("Do you want to register another member? (y/n): ").lower()
             if continue_choice == 'y':
-                return add_member()
+                add_member()
             elif continue_choice == 'n':
                 return
     except FileNotFoundError:
@@ -319,7 +319,7 @@ def remove_member():
                     for line in lines[1:]
                     if len(line.strip().split(',')) == len(headers)
                 ] 
-        selected_member = input("\nEnter Member ID to reset password (or type 'cancel' to abort): ").strip()
+        selected_member = input("\nEnter Member ID to remove member (or type 'cancel' to abort): ").strip()
         member_index = -1
         member_index_cred = -1
         for index, line in enumerate(member_sec):
@@ -333,16 +333,16 @@ def remove_member():
             if line[0] == selected_member:
                 member_index = index
         if selected_member.lower().strip() == 'cancel':
-            print("Reset canceled.")
-            return manage_members()
+            print("Removal canceled.")
+            return
         if member_index == -1:
             print("No matching ID found.")
         else:
             selected_member_row = member_cred[member_index_cred]
-            confirm = input(f"Are you sure you want to delete this member: {', '.join(selected_member_row)}? (y/n): ").lower()
+            confirm = input(f"Are you sure you want to remove this member: {', '.join(selected_member_row)}? (y/n): ").lower()
             if confirm != 'y':
-                print("Deletion canceled.")
-                return manage_members()
+                print("Removal canceled.")
+                return
             member_cred.pop(member_index_cred)
             member_sec.pop(member_index_sec)
 
@@ -357,11 +357,11 @@ def remove_member():
                     file.write(','.join(row) + '\n')
             print("Member removed successfully.")
             while True:
-                continue_choice = input("Do you want to register delete member? (y/n): ").lower()
+                continue_choice = input("Do you want to remove another member? (y/n): ").lower()
                 if continue_choice == 'y':
-                    return remove_member()
+                    remove_member()
                 elif continue_choice == 'n':
-                    return manage_members()
+                    return
 
 #@Password Reset Member Function:
 def password_reset_member():
@@ -411,7 +411,7 @@ def password_reset_member():
                 while True:
                     continue_choice = input("Do you want to reset another password? (y/n): ").lower()
                     if continue_choice == 'y':
-                        return password_reset_member()
+                        password_reset_member()
                     elif continue_choice == 'n':
                         return 
                     else:
@@ -440,7 +440,6 @@ def view_member_logs():
     while True:
         print("View Member Logs - Functionality to be implemented")
         input("Press Enter to continue...")
-        return manage_members()
 
 
 
@@ -449,6 +448,7 @@ def view_member_logs():
 
 
 #@ Administrator Section: //ANCHOR : Administrator Section:
+
 
 #@ Admin Login Function: //ANCHOR - Admin Login Function:
 def admin_login():
@@ -523,7 +523,7 @@ def manage_admin(admin):
         print("4. Reset Password")
         print("5. Previous Menu")
         print('6. Logout')
-        choice = input("Enter your choice (1-5): ")
+        choice = input("Enter your choice (1-6): ")
         if choice == '1':
             return view_admin(admin)
         elif choice == '2':
@@ -711,7 +711,7 @@ def manage_staff(admin):
         print("4. Reset Password")
         print("5. Previous Menu")
         print('6. Logout')
-        choice = input("Enter your choice (1-5): ")
+        choice = input("Enter your choice (1-6): ")
         if choice == '1':
             return view_staff(admin)
         elif choice == '2':

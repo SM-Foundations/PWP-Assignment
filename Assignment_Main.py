@@ -9,6 +9,7 @@ member_file_C = "Member Cred.txt"
 admin_file_P = "Admin Password.txt"
 staff_file_P = "Staff Password.txt"
 member_file_P = "Member Password.txt"
+member_logs = "Member Logs.txt"
 
 #@Main Menu Function do not delete or modify this function //ANCHOR : Main Menu Function:
 def main_menu():
@@ -242,8 +243,9 @@ def staff_table():
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
+####################################################
 #@ //!SECTION : Member Section:
-
+####################################################
 #@View Members Function:
 def member_table():
     try:
@@ -417,8 +419,11 @@ def password_reset_member():
                     else:
                         print("Invalid choice. Please try again.")
 
-def view_members():
+#def view_members():
     while True:
+        with open(member_file_C, 'r', encoding="utf-8") as file:
+            for line in file:
+                member_cred.append(line.strip().split(',')) 
         member_table()
         input("Press Enter to continue...")
         return 
@@ -438,11 +443,9 @@ def member_id_generator():
 #@View Member Logs Function:
 def view_member_logs():
     while True:
-        print("View Member Logs - Functionality to be implemented")
+        member_table()
         input("Press Enter to continue...")
-
-
-
+        return
 
 #@ Repository Management Function:
 
@@ -698,10 +701,9 @@ def password_reset_admin(admin):
                     else:
                         print("Invalid choice. Please try again.")
 
-###########################################
+######################################################
 #ANCHOR - Staff Management Section:
-###########################################
-
+######################################################
 def manage_staff(admin):
     while True:
         print("Staff Management")
@@ -883,7 +885,9 @@ def password_reset_staff(admin):
                 else:
                     print("Invalid choice. Please try again.")
 
+######################################################
 #ANCHOR - Member Management Section:
+######################################################
 def manage_members(admin):
     while True:
         print("Member Management")
@@ -913,7 +917,12 @@ def manage_members(admin):
         else:
             print("Invalid choice. Please try again.")
 
+
+
+
+######################################################
 #@ Repository Management Function:
+######################################################
 def manage_repository(admin):
     while True:
         print("Repository Management")

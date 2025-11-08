@@ -1,2 +1,0 @@
-AdminID,Name,Password,Contact
-00003,David,Wasd123!,0987654321

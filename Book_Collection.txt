@@ -1,1 +1,1 @@
-BookID,Name,Status
+BookID,Name,Status,ApprovalStat,

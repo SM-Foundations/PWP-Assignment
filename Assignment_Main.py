@@ -10,6 +10,8 @@ admin_file_P = "Admin Password.txt"
 staff_file_P = "Staff Password.txt"
 member_file_P = "Member Password.txt"
 member_logs = "Member Logs.txt"
+book_file = "Book_Collection.txt"
+book_logs_file = "Book Logs.txt"
 
 #@Main Menu Function do not delete or modify this function //ANCHOR : Main Menu Function:
 def main_menu():
@@ -448,11 +450,37 @@ def view_member_logs():
         return
 
 #@ Repository Management Function:
+def manage_repository(admin):
+    while True:
+        print("Repository Management - Functionality to be implemented")
+        input("Press Enter to continue...")
+        return admin_menu(admin)
+    
+
+def book_table():
+    try:
+        with open(book_file, 'r', encoding="utf-8") as file:
+            lines = file.readlines()
+            headers = lines[0].strip().split(',')
+            book_data = [
+                line.strip().split(',')
+                for line in lines[1:]
+                if len(line.strip().split(',')) == len(headers)
+            ]
+        if not book_data:
+            print("No data to be displayed")
+        headers = (f"|{headers[0]:10} | {headers[1]:<15} | {headers[2]:<20}|")
+        print(headers)
+        print(len(headers)*"-")
+        for row in book_data:
+            print(f"|{row[0]:<10} | {row[1]:<15} | {row[2]:<20}|")
+    except FileNotFoundError:
+        print(f"Error: '{book_file}' file not found.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
 
 
 #@ Administrator Section: //ANCHOR : Administrator Section:
-
-
 #@ Admin Login Function: //ANCHOR - Admin Login Function:
 def admin_login():
     try:
@@ -900,9 +928,9 @@ def manage_members(admin):
         print('7. Logout')
         choice = input("Enter your choice (1-7): ")
         if choice == '1':
-            view_members()
+            member_table()
         elif choice == '2':
-            view_member_logs()
+            member_logs_table()
         elif choice == '3':
             add_member()
         elif choice == '4':

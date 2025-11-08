@@ -1,1 +1,1 @@
-BookID,Status,Borrowed Date,Return Date
+BookID,Status,Borrowed Date,Return Date,MemberID

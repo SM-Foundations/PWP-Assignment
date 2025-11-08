@@ -2,19 +2,15 @@ import os
 import time
 import datetime
 
-# @ File Handling:
+#@ File Handling:
 admin_file_C = "Admin Cred.txt"
 staff_file_C = "Staff Cred.txt"
 member_file_C = "Member Cred.txt"
 admin_file_P = "Admin Password.txt"
 staff_file_P = "Staff Password.txt"
 member_file_P = "Member Password.txt"
-member_logs = "Member Logs.txt"
-book_file = "Book_Collection.txt"
-book_logs_file = "Book Logs.txt"
 
-
-# @Main Menu Function do not delete or modify this function //ANCHOR : Main Menu Function:
+#@Main Menu Function do not delete or modify this function //ANCHOR : Main Menu Function:
 def main_menu():
     while True:
         print("\nMain Menu:")
@@ -24,61 +20,34 @@ def main_menu():
         print("4. Guest Access")
         print("5. Exit")
         choice = input("Enter your choice (1-5): ")
-        if choice == "1":
+        if choice == '1':
             admin_login()
-        elif choice == "2":
+        elif choice == '2':
             staff_login()
-        elif choice == "3":
+        elif choice == '3':
             member_login()
-        elif choice == "4":
+        elif choice == '4':
             guest_access()
-        elif choice == "5":
+        elif choice == '5':
             print("Exiting the program.")
             break
         else:
             print("Invalid choice. Please try again.")
 
-
-# @Miscellaneous Functions://ANCHOR : Miscellaneous Functions:
-# lockout Function:
+#@Miscellaneous Functions://ANCHOR : Miscellaneous Functions:
+#lockout Function:
 def lockout(locked_out):
     while True:
         current_time = datetime.datetime.now()
         remaining_time = int((locked_out - current_time).total_seconds())
         if remaining_time <= 0:
             break
-        print(
-            f"Too many incorrect attempts. Please wait {remaining_time} seconds.",
-            end="\r",
-        )
+        print(f"Too many incorrect attempts. Please wait {remaining_time} seconds.", end='\r')
         time.sleep(1)
-
-
-# @Password Making Function:
+        
+#@Password Making Function:
 def password_making(password):
-    special_characters = [
-        "!",
-        "#",
-        "$",
-        "%",
-        "^",
-        "&",
-        "*",
-        "(",
-        ")",
-        ",",
-        ".",
-        "?",
-        '"',
-        ":",
-        "{",
-        "}",
-        "|",
-        "<",
-        ">",
-        "-",
-    ]
-    special_characters = ["!","@","#","$","%","^","&","*","(",")",",",".","?","\"",":","{","}","|","<",">","-"]
+    special_characters = ["!","#","$","%","^","&","*","(",")",",",".","?","\"",":","{","}","|","<",">","-"]
     if len(password) < 8:
         print("Password must be at least 8 characters long.")
         return False
@@ -96,15 +65,13 @@ def password_making(password):
         return False
     return True
 
-
-# @General Utility Functions:
+#@General Utility Functions:
 def get_valid_password():
     while True:
         password = input("Enter new password: ")
         if not password_making(password):
             continue
         return password
-
 
 def get_valid_contact(cred_files=None):
     if cred_files is None:
@@ -117,7 +84,7 @@ def get_valid_contact(cred_files=None):
                 with open(cred_file, "r", encoding="utf-8") as file:
                     next(file)
                     for line in file:
-                        parts = line.strip().split(",")
+                        parts = line.strip().split(',')
                         if len(parts) == 3:
                             _, _, stored_contact = parts
                         if input_contact == stored_contact:
@@ -133,27 +100,23 @@ def get_valid_contact(cred_files=None):
             continue
         return input_contact
 
-
-# @Get Valid Name Function:
+#@Get Valid Name Function:
 def get_valid_name():
-    while True:
-        name = input("Enter name: ")
-        if any(char.isdigit() for char in name) or not name.replace(" ", "").isalpha():
-            print(
-                "Invalid username. It must not contain numbers or special characters."
-            )
-            continue
-        return name
+        while True:
+            name = input("Enter name: ")
+            if any(char.isdigit() for char in name) or not name.replace(" ", "").isalpha():
+                print("Invalid username. It must not contain numbers or special characters.")
+                continue
+            return name
 
-
-# @ //!SECTION Admin Section:
+#@ //!SECTION Admin Section:
 def verify_password(stored_id, input_password):
     try:
         if os.path.exists(admin_file_P) and os.path.getsize(admin_file_P) > 0:
             with open(admin_file_P, "r", encoding="utf-8") as file:
                 next(file)
                 for line in file:
-                    stored_id, stored_password, *_ = line.strip().split(",")
+                    stored_id, stored_password, *_ = line.strip().split(',')
                     if stored_id == stored_id and stored_password == input_password:
                         return True
         return False
@@ -164,7 +127,6 @@ def verify_password(stored_id, input_password):
         print(f"An unexpected error occurred: {e}")
         return False
 
-
 def reverify_password(admin):
     try:
         attempts = 3
@@ -172,20 +134,15 @@ def reverify_password(admin):
             with open(admin_file_P, "r", encoding="utf-8") as file:
                 next(file)
                 for line in file:
-                    _, stored_password, Sec_Phrase = line.strip().split(",")
+                    _, stored_password, Sec_Phrase = line.strip().split(',')
                     while attempts > 0:
                         input_password = input("Re-enter password for verification: ")
                         input_phrase = input("Re-enter your security phrase: ")
-                        if (
-                            input_password == stored_password
-                            and input_phrase == Sec_Phrase
-                        ):
+                        if input_password == stored_password and input_phrase == Sec_Phrase:
                             return True
                         else:
                             attempts -= 1
-                            print(
-                                f"Incorrect password or security phrase. You have {attempts} attempts left."
-                            )
+                            print(f"Incorrect password or security phrase. You have {attempts} attempts left.")
             if attempts == 0:
                 locked_out = datetime.datetime.now() + datetime.timedelta(minutes=1)
                 lockout(locked_out)
@@ -194,10 +151,10 @@ def reverify_password(admin):
     except Exception as e:
         print(f"An unexpected error occurred during password verification: {e}")
         return False
+    
 
-
-def admin_id_generator():  # Generate a new Admin ID.
-    if os.path.exists(admin_file_C) and os.path.getsize(admin_file_C) > 0:
+def admin_id_generator(): #Generate a new Admin ID.
+    if os.path.exists(admin_file_C) and os.path.getsize(admin_file_C) > 0: 
         with open(admin_file_C, "r", encoding="utf-8") as file:
             next(file)
             num_users = len(file.readlines())
@@ -206,22 +163,18 @@ def admin_id_generator():  # Generate a new Admin ID.
         new_admin_id = "00001"
     print(f"Generated Admin ID: {new_admin_id}")
     return new_admin_id
-
+        
 
 def credential_verification(input_id, input_password, sec_phrase):
     input_id = input_id
     input_password = input_password
     sec_phrase = sec_phrase
     if os.path.exists(admin_file_P) and os.path.getsize(admin_file_P) > 0:
-        with open(admin_file_P, "r", encoding="utf-8") as file:
+        with open(admin_file_P, "r", encoding='utf-8') as file:
             next(file)
             for line in file:
-                stored_id, stored_password, stored_phrase = line.strip().split(",")
-                if (
-                    input_id == stored_id
-                    and input_password == stored_password
-                    and sec_phrase == stored_phrase
-                ):
+                stored_id, stored_password, stored_phrase = line.strip().split(',')
+                if input_id == stored_id and input_password == stored_password and sec_phrase == stored_phrase:
                     print("Credentials verified successfully.")
                     return True
         print("Invalid Admin ID or Password.")
@@ -230,34 +183,32 @@ def credential_verification(input_id, input_password, sec_phrase):
 
 def admin_table():
     try:
-        with open(admin_file_C, "r", encoding="utf-8") as file:
+        with open(admin_file_C, 'r', encoding="utf-8") as file:
             lines = file.readlines()
-            headers = lines[0].strip().split(",")
+            headers = lines[0].strip().split(',')
             admin_data = [
-                line.strip().split(",")
+                line.strip().split(',')
                 for line in lines[1:]
-                if len(line.strip().split(",")) == len(headers)
+                if len(line.strip().split(',')) == len(headers)
             ]
             if not admin_data:
                 print("No data to be displayed")
-        headers = f"|{headers[0]:10} | {headers[1]:<15} | {headers[2]:<20}|"
+        headers = (f"|{headers[0]:10} | {headers[1]:<15} | {headers[2]:<20}|")
         print(headers)
-        print(len(headers) * "-")
+        print(len(headers)*"-")
         for row in admin_data:
             print(f"|{row[0]:<10} | {row[1]:<15} | {row[2]:<20}|")
-        print(len(headers) * "-")
+        print(len(headers)*"-")
     except FileNotFoundError:
         print(f"Error: '{admin_file_C}' file not found.")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
-
-# ANCHOR - Staff Management Section:
-
+#ANCHOR - Staff Management Section:
 
 def StaffID_Generator():
     if os.path.exists(staff_file_C) and os.path.getsize(staff_file_C) > 0:
-        with open(staff_file_C, "r", encoding="utf-8") as file:
+        with open(staff_file_C, "r",encoding="utf-8") as file:
             next(file)
             num_users = len(file.readlines())
         new_staff_id = str(num_users + 1).zfill(5)
@@ -265,58 +216,50 @@ def StaffID_Generator():
         new_staff_id = "00001"
     print(f"Generated Staff ID: {new_staff_id}")
     return new_staff_id
-
-
 #!SECTION - Staff Table Function:
 
 
 def staff_table():
     try:
-        with open(staff_file_C, "r", encoding="utf-8") as file:
+        with open(staff_file_C, 'r', encoding="utf-8") as file:
             lines = file.readlines()
-            headers = lines[0].strip().split(",")
+            headers = lines[0].strip().split(',')
             staff_data = [
-                line.strip().split(",")
+                line.strip().split(',')
                 for line in lines[1:]
-                if len(line.strip().split(",")) == len(headers)
+                if len(line.strip().split(',')) == len(headers)
             ]
             if not staff_data:
                 print("No data to be displayed")
-        headers = f"|{headers[0]:10} | {headers[1]:<15} | {headers[2]:<20}|"
+        headers = (f"|{headers[0]:10} | {headers[1]:<15} | {headers[2]:<20}|")
         print(headers)
-        print(len(headers) * "-")
+        print(len(headers)*"-")
         for row in staff_data:
             print(f"|{row[0]:<10} | {row[1]:<15} | {row[2]:<20}|")
-        print(len(headers) * "-")
+        print(len(headers)*"-")
     except FileNotFoundError:
         print(f"Error: '{staff_file_C}' file not found.")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
-
-# @ //!SECTION : Member Section:
-
-
-# @View Members Function:
-####################################################
 #@ //!SECTION : Member Section:
-####################################################
+
 #@View Members Function:
 def member_table():
     try:
-        with open(member_file_C, "r", encoding="utf-8") as file:
+        with open(member_file_C, 'r', encoding="utf-8") as file:
             lines = file.readlines()
-            headers = lines[0].strip().split(",")
+            headers = lines[0].strip().split(',')
             member_data = [
-                line.strip().split(",")
+                line.strip().split(',')
                 for line in lines[1:]
-                if len(line.strip().split(",")) == len(headers)
+                if len(line.strip().split(',')) == len(headers)
             ]
         if not member_data:
             print("No data to be displayed")
-        headers = f"|{headers[0]:10} | {headers[1]:<15} | {headers[2]:<20}|"
+        headers = (f"|{headers[0]:10} | {headers[1]:<15} | {headers[2]:<20}|")
         print(headers)
-        print(len(headers) * "-")
+        print(len(headers)*"-")
         for row in member_data:
             print(f"|{row[0]:<10} | {row[1]:<15} | {row[2]:<20}|")
     except FileNotFoundError:
@@ -324,8 +267,7 @@ def member_table():
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
-
-# @Add Member Function:
+#@Add Member Function:
 def add_member():
     try:
         print("Member Registration")
@@ -338,63 +280,46 @@ def add_member():
             with open(member_file_C, "a", newline="\n", encoding="utf-8") as file:
                 file.write("MemberID,Name,Contact\n")
         with open(member_file_C, "a", newline="\n", encoding="utf-8") as file:
-            file.write(f"{member_id},{name},{contact}\n")
+                file.write(f"{member_id},{name},{contact}\n")
         if not os.path.exists(member_file_P) or os.path.getsize(member_file_P) == 0:
             with open(member_file_P, "a", newline="\n", encoding="utf-8") as file:
                 file.write("MemberID,Password,Security_Question\n")
         with open(member_file_P, "a", newline="\n", encoding="utf-8") as file:
             file.write(f"{member_id},{password},{security_phrase}\n")
-        member_table()
+        view_members()
         print(f"Member account set successfully for Member ID: {member_id}")
         while True:
-            continue_choice = input(
-                "Do you want to register another member? (y/n): "
-            ).lower()
-            if continue_choice == "y":
-                return add_member()
-            elif continue_choice == "n":
-                return manage_members()
             continue_choice = input("Do you want to register another member? (y/n): ").lower()
             if continue_choice == 'y':
-                add_member()
+                return add_member()
             elif continue_choice == 'n':
-                return
+                return manage_members()
     except FileNotFoundError:
-        print(
-            "Error: Member credential file not found. Please contact system administrator."
-        )
+        print("Error: Member credential file not found. Please contact system administrator.")
     except Exception as e:
         print(f"An unexpected error occurred during member registration: {e}")
 
-
-# @Remove Member Function:
+#@Remove Member Function:
 def remove_member():
     while True:
         view_members()
-        with open(member_file_P, "r", encoding="utf-8") as file:
+        with open(member_file_P, 'r', encoding="utf-8") as file:
             lines = file.readlines()
-            headers = lines[0].strip().split(",")
+            headers = lines[0].strip().split(',')
             member_sec = [
-                line.strip().split(",")
-                for line in lines[1:]
-                if len(line.strip().split(",")) == len(headers)
-            ]
-        with open(member_file_C, "r", encoding="utf-8") as file:
-            lines = file.readlines()
-            headers = lines[0].strip().split(",")
-            member_cred = [
-                line.strip().split(",")
-                for line in lines[1:]
-                if len(line.strip().split(",")) == len(headers)
-            ]
-        selected_member = input(
-            "\nEnter Member ID to reset password (or type 'cancel' to abort): "
-        ).strip()
                     line.strip().split(',')
                     for line in lines[1:]
                     if len(line.strip().split(',')) == len(headers)
                 ] 
-        selected_member = input("\nEnter Member ID to remove member (or type 'cancel' to abort): ").strip()
+        with open(member_file_C, 'r', encoding="utf-8") as file:
+            lines = file.readlines()
+            headers = lines[0].strip().split(',')
+            member_cred = [
+                    line.strip().split(',')
+                    for line in lines[1:]
+                    if len(line.strip().split(',')) == len(headers)
+                ] 
+        selected_member = input("\nEnter Member ID to reset password (or type 'cancel' to abort): ").strip()
         member_index = -1
         member_index_cred = -1
         for index, line in enumerate(member_sec):
@@ -407,127 +332,101 @@ def remove_member():
         for index, line in enumerate(member_sec):
             if line[0] == selected_member:
                 member_index = index
-        if selected_member.lower().strip() == "cancel":
+        if selected_member.lower().strip() == 'cancel':
             print("Reset canceled.")
             return manage_members()
-        if selected_member.lower().strip() == 'cancel':
-            print("Removal canceled.")
-            return
         if member_index == -1:
             print("No matching ID found.")
         else:
             selected_member_row = member_cred[member_index_cred]
-            confirm = input(
-                f"Are you sure you want to delete this member: {', '.join(selected_member_row)}? (y/n): "
-            ).lower()
-            if confirm != "y":
+            confirm = input(f"Are you sure you want to delete this member: {', '.join(selected_member_row)}? (y/n): ").lower()
+            if confirm != 'y':
                 print("Deletion canceled.")
                 return manage_members()
-            confirm = input(f"Are you sure you want to remove this member: {', '.join(selected_member_row)}? (y/n): ").lower()
-            if confirm != 'y':
-                print("Removal canceled.")
-                return
             member_cred.pop(member_index_cred)
             member_sec.pop(member_index_sec)
 
-            with open(member_file_C, "w", encoding="utf-8") as file:
-                file.write(",".join(headers) + "\n")
+            with open(member_file_C, 'w', encoding='utf-8') as file:
+                file.write(','.join(headers) + '\n')
                 for row in member_cred:
-                    file.write(",".join(row) + "\n")
+                    file.write(','.join(row) + '\n')
 
-            with open(member_file_P, "w", encoding="utf-8") as file:
-                file.write(",".join(headers) + "\n")
+            with open(member_file_P, 'w', encoding='utf-8') as file:
+                file.write(','.join(headers) + '\n')
                 for row in member_sec:
-                    file.write(",".join(row) + "\n")
+                    file.write(','.join(row) + '\n')
             print("Member removed successfully.")
             while True:
-                continue_choice = input(
-                    "Do you want to register delete member? (y/n): "
-                ).lower()
-                if continue_choice == "y":
-                    return remove_member()
-                elif continue_choice == "n":
-                    return manage_members()
-                continue_choice = input("Do you want to remove another member? (y/n): ").lower()
+                continue_choice = input("Do you want to register delete member? (y/n): ").lower()
                 if continue_choice == 'y':
-                    remove_member()
+                    return remove_member()
                 elif continue_choice == 'n':
-                    return
+                    return manage_members()
 
-
-# @Password Reset Member Function:
+#@Password Reset Member Function:
 def password_reset_member():
     while True:
         view_members()
-        with open(member_file_P, "r", encoding="utf-8") as file:
-        member_table()
         with open(member_file_P, 'r', encoding="utf-8") as file:
             lines = file.readlines()
-            headers = lines[0].strip().split(",")
+            headers = lines[0].strip().split(',')
             member_sec = [
-                line.strip().split(",")
-                for line in lines[1:]
-                if len(line.strip().split(",")) == len(headers)
-            ]
-        with open(member_file_C, "r", encoding="utf-8") as file:
+                    line.strip().split(',')
+                    for line in lines[1:]
+                    if len(line.strip().split(',')) == len(headers)
+                ] 
+        with open(member_file_C, 'r', encoding="utf-8") as file:
             lines = file.readlines()
-            headers = lines[0].strip().split(",")
+            headers = lines[0].strip().split(',')
             member_cred = [
-                line.strip().split(",")
-                for line in lines[1:]
-                if len(line.strip().split(",")) == len(headers)
-            ]
-            selected_member = input(
-                "\nEnter Member ID to reset password (or type 'cancel' to abort): "
-            ).strip()
+                    line.strip().split(',')
+                    for line in lines[1:]
+                    if len(line.strip().split(',')) == len(headers)
+                ] 
+            selected_member = input("\nEnter Member ID to reset password (or type 'cancel' to abort): ").strip()
             member_index = -1
             for index, line in enumerate(member_sec):
                 if line[0] == selected_member:
                     member_index = index
-            if selected_member == "cancel":
+            if selected_member == 'cancel':
                 print("Reset canceled.")
-                return
+                return manage_members()
             if member_index == -1:
                 print("No matching ID found.")
             else:
                 selected_member = member_cred[member_index]
-                confirm = input(
-                    f"Are you sure you want to reset password for this member: {', '.join(selected_member)}? (y/n): "
-                ).lower()
-                if confirm != "y":
+                confirm = input(f"Are you sure you want to reset password for this member: {', '.join(selected_member)}? (y/n): ").lower()
+                if confirm != 'y':
                     print("Password Reset Cancelled.")
-                    return
+                    return manage_members()
                 new_password = get_valid_password()
                 new_security_phrase = input("Enter a new security phrase: ")
                 member_sec[member_index][1] = new_password
                 member_sec[member_index][2] = new_security_phrase
-                with open(member_file_P, "w", encoding="utf-8") as file:
-                    file.write(",".join(headers) + "\n")
+                with open(member_file_P, 'w', encoding='utf-8') as file:
+                    file.write(','.join(headers) + '\n')
                     for row in member_sec:
-                        file.write(",".join(row) + "\n")
+                        file.write(','.join(row) + '\n')
                 print("Password reset successfully.")
                 while True:
                     continue_choice = input("Do you want to reset another password? (y/n): ").lower()
                     if continue_choice == 'y':
-                        password_reset_member()
+                        return password_reset_member()
                     elif continue_choice == 'n':
-                        return 
+                        return manage_members()
                     else:
                         print("Invalid choice. Please try again.")
 
-#def view_members():
+def view_members(admin):
     while True:
-        with open(member_file_C, 'r', encoding="utf-8") as file:
-            for line in file:
-                member_cred.append(line.strip().split(',')) 
         member_table()
         input("Press Enter to continue...")
-        return 
+        return manage_members(admin)
     
 #@Member ID Generator Function:
 def member_id_generator():
     if os.path.exists(member_file_C) and os.path.getsize(member_file_C) > 0:
-        with open(member_file_C, "r", encoding="utf-8") as file:
+        with open(member_file_C, "r",encoding="utf-8") as file:
             next(file)
             num_users = len(file.readlines())
         new_member_id = str(num_users + 1).zfill(5)
@@ -537,60 +436,34 @@ def member_id_generator():
     return new_member_id
 
 #@View Member Logs Function:
-def view_member_logs():
+def view_member_logs(admin):
     while True:
-        member_table()
+        print("View Member Logs - Functionality to be implemented")
         input("Press Enter to continue...")
-        return
+        return manage_members(admin)
 
-# @ Administrator Section: //ANCHOR : Administrator Section:
-def manage_repository(admin):
-    while True:
-        print("Repository Management - Functionality to be implemented")
-        input("Press Enter to continue...")
-        return admin_menu(admin)
-    
 
-def book_table():
-    try:
-        with open(book_file, 'r', encoding="utf-8") as file:
-            lines = file.readlines()
-            headers = lines[0].strip().split(',')
-            book_data = [
-                line.strip().split(',')
-                for line in lines[1:]
-                if len(line.strip().split(',')) == len(headers)
-            ]
-        if not book_data:
-            print("No data to be displayed")
-        headers = (f"|{headers[0]:10} | {headers[1]:<15} | {headers[2]:<20}|")
-        print(headers)
-        print(len(headers)*"-")
-        for row in book_data:
-            print(f"|{row[0]:<10} | {row[1]:<15} | {row[2]:<20}|")
-    except FileNotFoundError:
-        print(f"Error: '{book_file}' file not found.")
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+
+
+#@ Repository Management Function:
 
 
 #@ Administrator Section: //ANCHOR : Administrator Section:
+
 #@ Admin Login Function: //ANCHOR - Admin Login Function:
 def admin_login():
     try:
         attempts = 3
-        locked_out = None
+        locked_out = None 
         while attempts > 0:
             print("Admin Login")
             input_id = input("Enter Admin ID: ")
             input_password = input("Enter Password: ")
             sec_phrase = input("Enter Security Phrase: ")
             if credential_verification(input_id, input_password, sec_phrase):
-                admin = (input_id, input_password, sec_phrase)
+                admin = (input_id,input_password,sec_phrase)
                 return admin_menu(admin)
-            print(
-                f"Invalid Admin ID or Password. You have {attempts - 1} attempts left."
-            )
+            print(f"Invalid Admin ID or Password. You have {attempts-1} attempts left.")
             attempts -= 1
             if attempts == 0:
                 locked_out = datetime.datetime.now() + datetime.timedelta(minutes=1)
@@ -598,16 +471,14 @@ def admin_login():
                 attempts = 3
                 return main_menu()
     except FileNotFoundError:
-        print(
-            "Error: Admin credential file not found. Please contact system administrator."
-        )
+        print("Error: Admin credential file not found. Please contact system administrator.")
         return main_menu()
     except Exception as e:
         print(f"An unexpected error occurred during admin login: {e}")
         return main_menu()
 
-
-# @Admin Menu Function: //ANCHOR - Main Admin Menu Function:
+        
+#@Admin Menu Function: //ANCHOR - Main Admin Menu Function:
 def admin_menu(admin):
     while True:
         print("Admin Menu:")
@@ -618,32 +489,31 @@ def admin_menu(admin):
         print("5. Reset Password")
         print("6. Logout")
         choice = input("Enter your choice (1-6): ")
-        if choice == "1":
+        if choice == '1':
             if reverify_password(admin):
                 return manage_admin(admin)
-        elif choice == "2":
+        elif choice == '2':
             if reverify_password(admin):
                 return manage_staff(admin)
-        elif choice == "3":
+        elif choice == '3':
             if reverify_password(admin):
                 return manage_members(admin)
-        elif choice == "4":
+        elif choice == '4':
             if reverify_password(admin):
                 return manage_repository(admin)
-        elif choice == "5":
+        elif choice == '5':
             if reverify_password(admin):
                 return reset_password_self(admin)
-        elif choice == "6":
+        elif choice == '6':
             print("Logging out.")
             return main_menu()
         else:
             print("Invalid choice. Please try again.")
 
-
 ######################################################
-# @Admin Section://ANCHOR : Admin Menu Function:
+#@Admin Section://ANCHOR : Admin Menu Function:
 ######################################################
-# @Admin Manager Menu Function:
+#@Admin Manager Menu Function:
 def manage_admin(admin):
     while True:
         print("Administrator Management")
@@ -653,33 +523,31 @@ def manage_admin(admin):
         print("4. Reset Password")
         print("5. Previous Menu")
         print('6. Logout')
-        choice = input("Enter your choice (1-6): ")
+        choice = input("Enter your choice (1-5): ")
         if choice == '1':
             return view_admin(admin)
-        elif choice == "2":
+        elif choice == '2':
             return add_admin(admin)
-        elif choice == "3":
+        elif choice == '3':
             return remove_admin(admin)
-        elif choice == "4":
+        elif choice == '4':
             return password_reset_admin(admin)
-        elif choice == "5":
+        elif choice == '5':
             return admin_menu(admin)
-        elif choice == "6":
+        elif choice == '6':
             print("Logging Out")
             return main_menu()
         else:
             print("Invalid choice. Please try again.")
 
-
-# @ View Admin Functions:
+#@ View Admin Functions:
 def view_admin(admin):
     while True:
         admin_table()
         input("Press Enter to continue...")
         return manage_admin(admin)
 
-
-# @ Add Admin Function:
+#@ Add Admin Function:
 def add_admin(admin):
     while True:
         try:
@@ -702,42 +570,37 @@ def add_admin(admin):
             admin_table()
             print(f"Admin account set successfully for Admin ID: {admin_id}")
             while True:
-                continue_choice = input(
-                    "Do you want to register another admin? (y/n): "
-                ).lower()
-                if continue_choice == "y":
+                continue_choice = input("Do you want to register another admin? (y/n): ").lower()
+                if continue_choice == 'y':
                     return add_admin(admin)
-                elif continue_choice == "n":
+                elif continue_choice == 'n':
                     return manage_admin(admin)
         except FileNotFoundError:
             print("file not found")
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
-
-
-# @ Remove Admin Function:
+        
+#@ Remove Admin Function:
 def remove_admin(admin):
     while True:
         admin_table()
-        with open(admin_file_P, "r", encoding="utf-8") as file:
+        with open(admin_file_P, 'r', encoding="utf-8") as file:
             lines = file.readlines()
-            headers = lines[0].strip().split(",")
+            headers = lines[0].strip().split(',')
             admin_sec = [
-                line.strip().split(",")
-                for line in lines[1:]
-                if len(line.strip().split(",")) == len(headers)
-            ]
-        with open(admin_file_C, "r", encoding="utf-8") as file:
+                    line.strip().split(',')
+                    for line in lines[1:]
+                    if len(line.strip().split(',')) == len(headers)
+                ] 
+        with open(admin_file_C, 'r', encoding="utf-8") as file:
             lines = file.readlines()
-            headers = lines[0].strip().split(",")
+            headers = lines[0].strip().split(',')
             admin_cred = [
-                line.strip().split(",")
-                for line in lines[1:]
-                if len(line.strip().split(",")) == len(headers)
-            ]
-        selected_admin = input(
-            "\nEnter Admin ID to reset password (or type 'cancel' to abort): "
-        ).strip()
+                    line.strip().split(',')
+                    for line in lines[1:]
+                    if len(line.strip().split(',')) == len(headers)
+                ] 
+        selected_admin = input("\nEnter Admin ID to reset password (or type 'cancel' to abort): ").strip()
         admin_index = -1
         admin_index_cred = -1
         for index, line in enumerate(admin_sec):
@@ -750,105 +613,95 @@ def remove_admin(admin):
         for index, line in enumerate(admin_sec):
             if line[0] == selected_admin:
                 admin_index = index
-        if selected_admin.strip() == "cancel":
+        if selected_admin.strip() == 'cancel':
             print("Reset canceled.")
             return manage_admin(admin)
         if admin_index == -1:
             print("No matching ID found.")
         else:
             selected_admin_row = admin_cred[admin_index_cred]
-            confirm = input(
-                f"Are you sure you want to delete this admin: {', '.join(selected_admin_row)}? (y/n): "
-            ).lower()
-            if confirm != "y":
+            confirm = input(f"Are you sure you want to delete this admin: {', '.join(selected_admin_row)}? (y/n): ").lower()
+            if confirm != 'y':
                 print("Deletion canceled.")
                 return manage_admin(admin)
             admin_cred.pop(admin_index_cred)
             admin_sec.pop(admin_index_sec)
 
-            with open(admin_file_C, "w", encoding="utf-8") as file:
-                file.write(",".join(headers) + "\n")
+            with open(admin_file_C, 'w', encoding='utf-8') as file:
+                file.write(','.join(headers) + '\n')
                 for row in admin_cred:
-                    file.write(",".join(row) + "\n")
-
-            with open(admin_file_P, "w", encoding="utf-8") as file:
-                file.write(",".join(headers) + "\n")
+                    file.write(','.join(row) + '\n')
+            
+            with open(admin_file_P, 'w', encoding='utf-8') as file:
+                file.write(','.join(headers) + '\n')
                 for row in admin_sec:
-                    file.write(",".join(row) + "\n")
+                    file.write(','.join(row) + '\n')
             print("Admin removed successfully.")
             while True:
-                continue_choice = input(
-                    "Do you want to register delete admin? (y/n): "
-                ).lower()
-                if continue_choice == "y":
+                continue_choice = input("Do you want to register delete admin? (y/n): ").lower()
+                if continue_choice == 'y':
                     return remove_admin(admin)
-                elif continue_choice == "n":
+                elif continue_choice == 'n':
                     return manage_admin(admin)
-
-
-# @ Password Reset Function:
+    
+#@ Password Reset Function:
 def password_reset_admin(admin):
     while True:
         admin_table()
-        with open(admin_file_P, "r", encoding="utf-8") as file:
+        with open(admin_file_P, 'r', encoding="utf-8") as file:
             lines = file.readlines()
-            headers = lines[0].strip().split(",")
+            headers = lines[0].strip().split(',')
             admin_sec = [
-                line.strip().split(",")
-                for line in lines[1:]
-                if len(line.strip().split(",")) == len(headers)
-            ]
-        with open(admin_file_C, "r", encoding="utf-8") as file:
+                    line.strip().split(',')
+                    for line in lines[1:]
+                    if len(line.strip().split(',')) == len(headers)
+                ] 
+        with open(admin_file_C, 'r', encoding="utf-8") as file:
             lines = file.readlines()
-            headers = lines[0].strip().split(",")
+            headers = lines[0].strip().split(',')
             admin_cred = [
-                line.strip().split(",")
-                for line in lines[1:]
-                if len(line.strip().split(",")) == len(headers)
-            ]
-            selected_admin = input(
-                "\nEnter Admin ID to reset password (or type 'cancel' to abort): "
-            ).strip()
+                    line.strip().split(',')
+                    for line in lines[1:]
+                    if len(line.strip().split(',')) == len(headers)
+                ] 
+            selected_admin = input("\nEnter Admin ID to reset password (or type 'cancel' to abort): ").strip()
             admin_index = -1
             for index, line in enumerate(admin_sec):
                 if line[0] == selected_admin:
                     admin_index = index
-            if selected_admin == "cancel":
+            if selected_admin == 'cancel':
                 print("Reset canceled.")
                 return manage_admin(admin)
             if admin_index == -1:
                 print("No matching ID found.")
             else:
                 selected_admin = admin_cred[admin_index]
-                confirm = input(
-                    f"Are you sure you want to reset password for this admin: {', '.join(selected_admin)}? (y/n): "
-                ).lower()
-                if confirm != "y":
+                confirm = input(f"Are you sure you want to reset password for this admin: {', '.join(selected_admin)}? (y/n): ").lower()
+                if confirm != 'y':
                     print("Password Reset Cancelled.")
                     return manage_admin(admin)
                 new_password = get_valid_password()
                 new_security_phrase = input("Enter a new security phrase: ")
                 admin_sec[admin_index][1] = new_password
                 admin_sec[admin_index][2] = new_security_phrase
-                with open(admin_file_P, "w", encoding="utf-8") as file:
-                    file.write(",".join(headers) + "\n")
+                with open(admin_file_P, 'w', encoding='utf-8') as file:
+                    file.write(','.join(headers) + '\n')
                     for row in admin_sec:
-                        file.write(",".join(row) + "\n")
+                        file.write(','.join(row) + '\n')
                 print("Password reset successfully.")
                 while True:
-                    continue_choice = input(
-                        "Do you want to reset another password? (y/n): "
-                    ).lower()
-                    if continue_choice == "y":
+                    continue_choice = input("Do you want to reset another password? (y/n): ").lower()
+                    if continue_choice == 'y':
                         return password_reset_admin(admin)
-                    elif continue_choice == "n":
+                    elif continue_choice == 'n':
                         return manage_admin(admin)
                     else:
                         print("Invalid choice. Please try again.")
 
-######################################################
+###########################################
 #ANCHOR - Staff Management Section:
-######################################################
+###########################################
+
 def manage_staff(admin):
     while True:
         print("Staff Management")
@@ -857,27 +710,23 @@ def manage_staff(admin):
         print("3. Remove Staff")
         print("4. Reset Password")
         print("5. Previous Menu")
-        print("6. Logout")
-        choice = input("Enter your choice (1-5): ")
-        if choice == "1":
         print('6. Logout')
-        choice = input("Enter your choice (1-6): ")
+        choice = input("Enter your choice (1-5): ")
         if choice == '1':
             return view_staff(admin)
-        elif choice == "2":
+        elif choice == '2':
             return add_staff(admin)
-        elif choice == "3":
+        elif choice == '3':
             return remove_staff(admin)
-        elif choice == "4":
+        elif choice == '4':
             return password_reset_staff(admin)
-        elif choice == "5":
+        elif choice == '5':
             return admin_menu(admin)
-        elif choice == "6":
+        elif choice == '6':
             print("Logging Out")
             return main_menu()
         else:
             print("Invalid choice. Please try again.")
-
 
 def view_staff(admin):
     while True:
@@ -885,8 +734,7 @@ def view_staff(admin):
         staff_table()
         input("Press Enter to continue...")
         return manage_staff(admin)
-
-
+    
 def add_staff(admin):
     while True:
         try:
@@ -900,7 +748,7 @@ def add_staff(admin):
                 with open(staff_file_C, "a", newline="\n", encoding="utf-8") as file:
                     file.write("StaffID,Name,Contact\n")
             with open(staff_file_C, "a", newline="\n", encoding="utf-8") as file:
-                file.write(f"{staff_id},{name},{contact}\n")
+                    file.write(f"{staff_id},{name},{contact}\n")
             if not os.path.exists(staff_file_P) or os.path.getsize(staff_file_P) == 0:
                 with open(staff_file_P, "a", newline="\n", encoding="utf-8") as file:
                     file.write("StaffID,Password,Security_Question\n")
@@ -909,43 +757,36 @@ def add_staff(admin):
             staff_table()
             print(f"Staff account set successfully for Staff ID: {staff_id}")
             while True:
-                continue_choice = input(
-                    "Do you want to register another staff member? (y/n): "
-                ).lower()
-                if continue_choice == "y":
+                continue_choice = input("Do you want to register another staff member? (y/n): ").lower()
+                if continue_choice == 'y':
                     return add_staff(admin)
-                elif continue_choice == "n":
+                elif continue_choice == 'n':
                     return manage_staff(admin)
         except FileNotFoundError:
-            print(
-                "Error: Staff credential file not found. Please contact system administrator."
-            )
+            print("Error: Staff credential file not found. Please contact system administrator.")
         except Exception as e:
             print(f"An unexpected error occurred during staff registration: {e}")
-
 
 def remove_staff(admin):
     while True:
         staff_table()
-        with open(staff_file_P, "r", encoding="utf-8") as file:
-            lines = file.readlines()
-            headers = lines[0].strip().split(",")
-            staff_sec = [
-                line.strip().split(",")
-                for line in lines[1:]
-                if len(line.strip().split(",")) == len(headers)
-            ]
-        with open(staff_file_C, "r", encoding="utf-8") as file:
-            lines = file.readlines()
-            headers = lines[0].strip().split(",")
-            staff_cred = [
-                line.strip().split(",")
-                for line in lines[1:]
-                if len(line.strip().split(",")) == len(headers)
-            ]
-        selected_staff = input(
-            "\nEnter Staff ID to reset password (or type 'cancel' to abort): "
-        ).strip()
+        with open(staff_file_P, 'r', encoding="utf-8") as file:
+                lines = file.readlines()
+                headers = lines[0].strip().split(',')
+                staff_sec = [
+                        line.strip().split(',')
+                        for line in lines[1:]
+                        if len(line.strip().split(',')) == len(headers)
+                    ] 
+        with open(staff_file_C, 'r', encoding="utf-8") as file:
+                lines = file.readlines()
+                headers = lines[0].strip().split(',')
+                staff_cred = [
+                        line.strip().split(',')
+                        for line in lines[1:]
+                        if len(line.strip().split(',')) == len(headers)
+                    ] 
+        selected_staff = input("\nEnter Staff ID to reset password (or type 'cancel' to abort): ").strip()
         staff_index = -1
         staff_index_cred = -1
         for index, line in enumerate(staff_sec):
@@ -958,106 +799,91 @@ def remove_staff(admin):
         for index, line in enumerate(staff_sec):
             if line[0] == selected_staff:
                 staff_index = index
-        if selected_staff.lower().strip() == "cancel":
+        if selected_staff.lower().strip() == 'cancel':
             print("Reset canceled.")
             return manage_staff(admin)
         if staff_index == -1:
             print("No matching ID found.")
         else:
             selected_staff_row = staff_cred[staff_index_cred]
-            confirm = input(
-                f"Are you sure you want to delete this staff: {', '.join(selected_staff_row)}? (y/n): "
-            ).lower()
-            if confirm != "y":
+            confirm = input(f"Are you sure you want to delete this staff: {', '.join(selected_staff_row)}? (y/n): ").lower()
+            if confirm != 'y':
                 print("Deletion canceled.")
                 return manage_staff(admin)
             staff_cred.pop(staff_index_cred)
             staff_sec.pop(staff_index_sec)
 
-            with open(staff_file_C, "w", encoding="utf-8") as file:
-                file.write(",".join(headers) + "\n")
+            with open(staff_file_C, 'w', encoding='utf-8') as file:
+                file.write(','.join(headers) + '\n')
                 for row in staff_cred:
-                    file.write(",".join(row) + "\n")
+                    file.write(','.join(row) + '\n')
 
-            with open(staff_file_P, "w", encoding="utf-8") as file:
-                file.write(",".join(headers) + "\n")
+            with open(staff_file_P, 'w', encoding='utf-8') as file:
+                file.write(','.join(headers) + '\n')
                 for row in staff_sec:
-                    file.write(",".join(row) + "\n")
+                    file.write(','.join(row) + '\n')
             print("Staff removed successfully.")
             while True:
-                continue_choice = input(
-                    "Do you want to register delete staff? (y/n): "
-                ).lower()
-                if continue_choice == "y":
+                continue_choice = input("Do you want to register delete staff? (y/n): ").lower()
+                if continue_choice == 'y':
                     return remove_staff(admin)
-                elif continue_choice == "n":
+                elif continue_choice == 'n':
                     return manage_staff(admin)
-
 
 def password_reset_staff(admin):
     while True:
         staff_table()
-        with open(staff_file_P, "r", encoding="utf-8") as file:
+        with open(staff_file_P, 'r', encoding="utf-8") as file:
             lines = file.readlines()
-            headers = lines[0].strip().split(",")
+            headers = lines[0].strip().split(',')
             staff_sec = [
-                line.strip().split(",")
+                line.strip().split(',')
                 for line in lines[1:]
-                if len(line.strip().split(",")) == len(headers)
+                if len(line.strip().split(',')) == len(headers)
             ]
-        with open(staff_file_C, "r", encoding="utf-8") as file:
+        with open(staff_file_C, 'r', encoding="utf-8") as file:
             lines = file.readlines()
-            headers = lines[0].strip().split(",")
+            headers = lines[0].strip().split(',')
             staff_cred = [
-                line.strip().split(",")
+                line.strip().split(',')
                 for line in lines[1:]
-                if len(line.strip().split(",")) == len(headers)
+                if len(line.strip().split(',')) == len(headers)
             ]
-        selected_staff = input(
-            "\nEnter Staff ID to reset password (or type 'cancel' to abort): "
-        ).strip()
+        selected_staff = input("\nEnter Staff ID to reset password (or type 'cancel' to abort): ").strip()
         staff_index = -1
         for index, line in enumerate(staff_sec):
             if line[0] == selected_staff:
                 staff_index = index
-        if selected_staff == "cancel":
+        if selected_staff == 'cancel':
             print("Reset canceled.")
             return manage_staff(admin)
         if staff_index == -1:
             print("No matching ID found.")
         else:
             selected_staff = staff_cred[staff_index]
-            confirm = input(
-                f"Are you sure you want to reset password for this staff: {', '.join(selected_staff)}? (y/n): "
-            ).lower()
-            if confirm != "y":
+            confirm = input(f"Are you sure you want to reset password for this staff: {', '.join(selected_staff)}? (y/n): ").lower()
+            if confirm != 'y':
                 print("Password Reset Cancelled.")
                 return manage_staff(admin)
             new_password = get_valid_password()
             new_security_phrase = input("Enter a new security phrase: ")
             staff_sec[staff_index][1] = new_password
             staff_sec[staff_index][2] = new_security_phrase
-            with open(staff_file_P, "w", encoding="utf-8") as file:
-                file.write(",".join(headers) + "\n")
+            with open(staff_file_P, 'w', encoding='utf-8') as file:
+                file.write(','.join(headers) + '\n')
                 for row in staff_sec:
-                    file.write(",".join(row) + "\n")
+                    file.write(','.join(row) + '\n')
             print("Password reset successfully.")
             while True:
-                continue_choice = input(
-                    "Do you want to reset another password? (y/n): "
-                ).lower()
-                if continue_choice == "y":
+                continue_choice = input("Do you want to reset another password? (y/n): ").lower()
+                if continue_choice == 'y':
                     return password_reset_admin(admin)
-                elif continue_choice == "n":
+                elif continue_choice == 'n':
                     return manage_admin(admin)
                 else:
                     print("Invalid choice. Please try again.")
 
-
-# ANCHOR - Member Management Section:
-######################################################
 #ANCHOR - Member Management Section:
-######################################################
 def manage_members(admin):
     while True:
         print("Member Management")
@@ -1067,44 +893,27 @@ def manage_members(admin):
         print("4. Remove Member")
         print("5. Reset Password")
         print("6. Previous Menu")
-        print("7. Logout")
+        print('7. Logout')
         choice = input("Enter your choice (1-7): ")
-        if choice == "1":
-            return view_members(admin)
-        elif choice == "2":
-            return view_member_logs(admin)
-        elif choice == "3":
-            return add_member(admin)
-        elif choice == "4":
-            return remove_member(admin)
-        elif choice == "5":
-            return password_reset_member(admin)
-        elif choice == "6":
         if choice == '1':
-            member_table()
+            return view_members(admin)
         elif choice == '2':
-            member_logs_table()
+            return view_member_logs(admin)
         elif choice == '3':
-            add_member()
+            return add_member(admin)
         elif choice == '4':
-            remove_member()
+            return remove_member(admin)
         elif choice == '5':
-            password_reset_member()
+            return password_reset_member(admin)
         elif choice == '6':
             return admin_menu(admin)
-        elif choice == "7":
+        elif choice == '7':
             print("Logging Out")
             return main_menu()
         else:
             print("Invalid choice. Please try again.")
 
-
-# @ Repository Management Function:
-
-
-######################################################
 #@ Repository Management Function:
-######################################################
 def manage_repository(admin):
     while True:
         print("Repository Management")
@@ -1114,25 +923,64 @@ def manage_repository(admin):
         print("4. Previous Menu")
         print("5. Logout")
         choice = input("Enter your choice (1-5): ")
-        if choice == "1":
+        if choice == '1':
             return view_repository()
-        elif choice == "2":
+        elif choice == '2':
             return add_repository(admin)
-        elif choice == "3":
+        elif choice == '3':
             return remove_repository(admin)
-        elif choice == "4":
+        elif choice == '4':
             return admin_menu(admin)
-        elif choice == "5":
+        elif choice == '5':
             print("Logging Out")
             return main_menu()
 
 
-# @Staff Section:
-# Staff Login Function:
 
 
-# Member Section:
-# Member Login Function:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#@Staff Section:
+#Staff Login Function:
+
+
+
+
+
+
+
+
+#Member Section:
+#Member Login Function:
 # SAEED
 
 
@@ -1141,37 +989,30 @@ def member_credential_verification(input_id, input_password, sec_phrase):
     input_password = input_password
     sec_phrase = sec_phrase
     if os.path.exists(member_file_P) and os.path.getsize(member_file_P) > 0:
-        with open(member_file_P, "r", encoding="utf-8") as file:
+        with open(member_file_P, "r", encoding='utf-8') as file:
             next(file)
             for line in file:
-                stored_id, stored_password, stored_phrase = line.strip().split(",")
-                if (
-                    input_id == stored_id
-                    and input_password == stored_password
-                    and sec_phrase == stored_phrase
-                ):
+                stored_id, stored_password, stored_phrase = line.strip().split(',')
+                if input_id == stored_id and input_password == stored_password and sec_phrase == stored_phrase:
                     print("Credentials verified successfully.")
                     return True
         print("Invalid Member ID or Password.")
     return False
 
-
 def member_login():
     try:
         attempts = 3
-        locked_out = None
+        locked_out = None 
         while attempts > 0:
             print("Member Login")
             input_id = input("Enter Member ID: ")
             input_password = input("Enter Password: ")
             sec_phrase = input("Enter Security Phrase: ")
             if member_credential_verification(input_id, input_password, sec_phrase):
-                member = (input_id, input_password, sec_phrase)
-                print(member)
+                member = (input_id,input_password,sec_phrase)
+                print(member)              
                 return member_menu(member)
-            print(
-                f"Invalid Member ID or Password. You have {attempts - 1} attempts left."
-            )
+            print(f"Invalid Member ID or Password. You have {attempts-1} attempts left.")
             attempts -= 1
             if attempts == 0:
                 locked_out = datetime.datetime.now() + datetime.timedelta(minutes=1)
@@ -1179,28 +1020,25 @@ def member_login():
                 attempts = 3
                 return main_menu()
     except FileNotFoundError:
-        print(
-            "Error: Member credential file not found. Please contact system administrator."
-        )
+        print("Error: Member credential file not found. Please contact system administrator.")
         return main_menu()
     except Exception as e:
         print(f"An unexpected error occurred during member login: {e}")
         return main_menu()
 
-
 def member_menu(member):
     while True:
-        print("Member Menu:")
+        print("Menu Menu:")
         print("1. Borrow a Book")
         print("2. View Book History")
         print("3. Reset Password")
         print("4. Logout")
-        choice = input("Enter your choice (1-4): ")
-        if choice == "1":
+        choice = input("Enter your choice (1-6): ")
+        if choice == '1':
             with open("Book_Collection.txt") as book_collection:
                 book_collection_lines = book_collection.readlines()
             for line in book_collection_lines:
-                print("=" * 70)
+                print("="*80)
                 print("\t||\t".join(line.strip().split(",")))
 
             book_collection = []
@@ -1209,62 +1047,43 @@ def member_menu(member):
             # print(book_collection)
             book_id = input("Enter BookID: ")
             book_index = 0
-            for book in book_collection:
+            for book in book_collection: 
                 if book[0] == book_id:
                     print("You have selected:", book_id)
                     print("\t||\t".join(book))
-                    if book[3] != "None":
+                    if book[3] == "None":
                         print("Error: Book has already been borrowed/requested")
                         return member_menu(member)
-                    response = input("Do you confirm? (y/n) ")
-                    if response == "y" or response == "Y":
+                    response = input("Do you confirm? (y/n)")
+                    if response == "y" or response == "Y":   
                         book_collection[book_index][2] = "requested"
                         book_collection[book_index][3] = member[0]
+                        print(book_collection)
                         with open("Book_Collection.txt", "w") as collection_file:
                             for line in book_collection:
-                                collection_file.write(",".join(line) + "\n")
-
-                        print("Book has been requested")
+                               collection_file.write(",".join(line) + "\n")
                     return member_menu(member)
 
-                book_index += 1
 
+
+
+
+                book_index += 1
+            
             print("Invalid BookID")
             return member_menu(member)
+            
 
-        elif choice == "2":
-            with open("Book Logs.txt") as log_file:
-                user_log_lines = log_file.readlines()
 
-            # Filter user_log_lines to only include lines with member id
-            filtered_log_lines = []
-            for line in user_log_lines:
-                parts = line.strip().split(",")
-                if len(parts) > 0 and parts[0] == member[0]:
-                    filtered_log_lines.append(line)
-            user_log_lines = filtered_log_lines
 
-            # Filter to only include the first instence of each book using BookID
-            # Filter to only include the first instance of each book using BookID
-            seen_book_ids = []
-            unique_log_lines = []
-            for line in user_log_lines:
-                parts = line.strip().split(",")
-                if len(parts) > 1:
-                    book_id = parts[1]
-                    if book_id not in seen_book_ids:
-                        seen_book_ids.append(book_id)
-                        unique_log_lines.append(line)
-            user_log_lines = unique_log_lines
+        elif choice == '2':
+            pass  
 
-            for line in user_log_lines:
-                print("\t||\t".join(line.strip().split(",")[1:]))
-
-        elif choice == "3":
+        elif choice == '3':
             pass
             # if member_reverify_password(member):
-            # return reset_password_self(member)
-        elif choice == "4":
+                # return reset_password_self(member)
+        elif choice == '4':
             print("Logging out.")
             return main_menu()
         else:
@@ -1278,20 +1097,15 @@ def member_reverify_password(member):
             with open(member_file_P, "r", encoding="utf-8") as file:
                 next(file)
                 for line in file:
-                    _, stored_password, Sec_Phrase = line.strip().split(",")
+                    _, stored_password, Sec_Phrase = line.strip().split(',')
                     while attempts > 0:
                         input_password = input("Re-enter password for verification: ")
                         input_phrase = input("Re-enter your security phrase: ")
-                        if (
-                            input_password == stored_password
-                            and input_phrase == Sec_Phrase
-                        ):
+                        if input_password == stored_password and input_phrase == Sec_Phrase:
                             return True
                         else:
                             attempts -= 1
-                            print(
-                                f"Incorrect password or security phrase. You have {attempts} attempts left."
-                            )
+                            print(f"Incorrect password or security phrase. You have {attempts} attempts left.")
             if attempts == 0:
                 locked_out = datetime.datetime.now() + datetime.timedelta(minutes=1)
                 lockout(locked_out)
@@ -1302,15 +1116,20 @@ def member_reverify_password(member):
         return False
 
 
-# Guest Section:
-# Guest Access Function:
+
+
+#Guest Section:
+#Guest Access Function:
+
+
+
+
+
 
 
 # DO NOT DELETE THE BELOW LINE OR ENTER ANYTHING BELOW THIS LINE UNLESS YOU ARE DELBERT #@
 def main():
     while True:
-        main_menu()
-
-
+       main_menu()
 if __name__ == "__main__":
     main_menu()

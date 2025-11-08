@@ -1,1 +1,12 @@
+BookID,Book_Name,Due_Date,MemberID
+01,Fishing Guide,requested,00002
+02,Geography,1900-10-22,None
+03,Biology,requested,00002
+04,Python Basics,2025-11-10,00001
+05,Data Science,2025-11-20,None
+06,World History,2025-10-30,00003
+07,Machine Learning,2025-12-05,00005
+08,Cooking Secrets,requested,00002
+09,Travel Guide,2025-11-01,00004
+10,Astronomy,2025-12-15,00006
 BookID,Name,Status

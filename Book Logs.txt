@@ -18,3 +18,4 @@ MemberID,Date_Borrowed,Date_Returned,BookID,Book_Name
 00007,2024-04-10,2024-05-10,06,World History
 00001,2024-05-01,2024-06-01,07,Machine Learning
 00006,2024-05-15,2024-06-15,05,Data Science 
+BookID,Status,Borrowed Date,Return Date

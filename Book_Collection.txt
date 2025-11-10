@@ -1,12 +1,38 @@
-BookID,Book_Name,Due_Date,MemberID
-01,Fishing Guide,requested,00002
-02,Geography,1900-10-22,None
-03,Biology,requested,00002
-04,Python Basics,2025-11-10,00001
-05,Data Science,2025-11-20,None
-06,World History,2025-10-30,00003
-07,Machine Learning,2025-12-05,00005
-08,Cooking Secrets,requested,00002
-09,Travel Guide,2025-11-01,00004
-10,Astronomy,2025-12-15,00006
-BookID,Name,Status
+BookID,ISBN,Name,Category,Status
+B0001,9780007458424,The Hobbit,Fiction,Available
+B0002,9780261103573,The Fellowship of the Ring,Fiction,Available
+B0003,9780261103580,The Two Towers,Fiction,Available
+B0004,9780261103597,The Return of the King,Fiction,Available
+B0005,9780547928227,The Silmarillion,Fiction,Available
+B0006,9780261102736,Unfinished Tales,Fiction,Available
+B0007,9780261103627,The Children of Húrin,Fiction,Available
+B0008,9780007322565,The Legend of Sigurd and Gudrún,Fiction,Available
+B0009,9780008131364,The Fall of Arthur,Fiction,Available
+B0010,9780007523221,Beowulf: A Translation and Commentary,Fiction,Available
+B0011,9780261102231,The Book of Lost Tales Part One,Fiction,Available
+B0012,9780261102248,The Book of Lost Tales Part Two,Fiction,Available
+B0013,9780261102255,The Lays of Beleriand,Fiction,Available
+B0014,9780261102262,The Shaping of Middle-earth,Fiction,Available
+B0015,9780261102279,The Lost Road and Other Writings,Fiction,Available
+B0016,9780261102286,The Return of the Shadow,Fiction,Available
+B0017,9780261102293,The Treason of Isengard,Fiction,Available
+B0018,9780261102309,The War of the Ring,Fiction,Available
+B0019,9780261102316,Sauron Defeated,Fiction,Available
+B0020,9780261102323,Morgoth’s Ring,Fiction,Available
+B0021,9780261102330,The War of the Jewels,Fiction,Available
+B0022,9780261102347,The Peoples of Middle-earth,Fiction,Available
+B0023,9780008400413,The Nature of Middle-earth,Fiction,Available
+B0024,9781782535963,Fall of Cadia,Science Fiction,Available
+B0025,9781784961609,The Relentless Dead,Science Fiction,Available
+B0026,9781782534409,Imperial Armour Volume Seven: The Siege of Vraks,Science Fiction,Available
+B0027,9781784964228,The Gathering Storm: Rise of the Primarch,Science Fiction,Available
+B0028,9781784966635,Cadia Stands!,Science Fiction,Available
+B0029,9781784966888,The Solar War,Science Fiction,Available
+B0030,9781784969261,The Lost and the Damned,Science Fiction,Available
+B0031,9781789991977,The First Wall,Science Fiction,Available
+B0032,9781800261203,Saturnine,Science Fiction,Available
+B0033,9781800261968,Mortis,Science Fiction,Available
+B0034,9781800267885,Warhawk,Science Fiction,Available
+B0035,9781804070610,Echoes of Eternity,Science Fiction,Available
+B0036,9781804074670,The End and the Death Volume I,Science Fiction,Available
+B0037,9781804074687,The End and the Death Volume II,Science Fiction,Available

@@ -1,0 +1,39 @@
+MemberID,BookID,Name,Date_Borrowed,Date_Returned,Overdue
+00001,B0001,The Hobbit,2025-10-10,2025-10-25,No
+00002,B0024,Fall of Cadia,2025-10-12,,Yes
+00003,B0002,The Fellowship of the Ring,2025-10-15,2025-10-30,No
+00004,B0004,The Return of the King,2025-10-18,,Yes
+00005,B0003,The Two Towers,2025-10-20,2025-11-02,No
+00006,B0025,The Relentless Dead,2025-10-22,,Yes
+00007,B0005,The Silmarillion,2025-10-24,2025-11-07,No
+00008,B0026,Imperial Armour Volume Seven: The Siege of Vraks,2025-10-25,,Yes
+00009,B0007,The Children of Húrin,2025-10-27,2025-11-09,No
+00010,B0024,Fall of Cadia,2025-10-28,,Yes
+00011,B0001,The Hobbit,2025-10-29,2025-11-10,No
+00012,B0025,The Relentless Dead,2025-10-30,,Yes
+00013,B0004,The Return of the King,2025-11-01,2025-11-10,No
+00014,B0026,Imperial Armour Volume Seven: The Siege of Vraks,2025-11-02,,Yes
+00015,B0002,The Fellowship of the Ring,2025-11-03,2025-11-09,No
+00016,B0025,The Relentless Dead,2025-11-04,,Yes
+00017,B0003,The Two Towers,2025-11-05,2025-11-10,No
+00018,B0024,Fall of Cadia,2025-11-06,,Yes
+00019,B0007,The Children of Húrin,2025-11-07,2025-11-10,No
+00020,B0026,Imperial Armour Volume Seven: The Siege of Vraks,2025-11-08,,Yes
+00021,B0027,The Gathering Storm: Rise of the Primarch,2025-11-09,,Yes
+00022,B0008,The Legend of Sigurd and Gudrún,2025-11-09,2025-11-10,No
+00023,B0028,Cadia Stands!,2025-11-08,,Yes
+00024,B0014,The Shaping of Middle-earth,2025-11-05,2025-11-09,No
+00025,B0030,The Lost and the Damned,2025-11-07,,Yes
+00026,B0017,The Treason of Isengard,2025-11-01,2025-11-09,No
+00027,B0031,The First Wall,2025-11-03,,Yes
+00028,B0015,The Lost Road and Other Writings,2025-11-04,2025-11-10,No
+00029,B0032,Saturnine,2025-11-06,,Yes
+00030,B0020,Morgoth’s Ring,2025-11-08,2025-11-10,No
+00031,B0033,Mortis,2025-11-09,,Yes
+00032,B0021,The War of the Jewels,2025-11-07,2025-11-10,No
+00033,B0034,Warhawk,2025-11-09,,Yes
+00034,B0022,The Peoples of Middle-earth,2025-11-04,2025-11-10,No
+00035,B0035,Echoes of Eternity,2025-11-09,,Yes
+00036,B0023,The Nature of Middle-earth,2025-11-06,2025-11-09,No
+00037,B0036,The End and the Death Volume I,2025-11-07,,Yes
+00038,B0037,The End and the Death Volume II,2025-11-09,,Yes

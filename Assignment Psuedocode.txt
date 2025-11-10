@@ -10,6 +10,9 @@ Library Admin Section: Delbert
 Library Staff: Woo Wen Han
 Library Member: Saeed
 Library Guests: Oon Zheng Han
+
+#NOTES#
+# Master Credential for all available login is as follows: 1,1,1
 ---------------------------------------------------------------------------
 FILE HANDLING:
 // File handling constants
@@ -29,12 +32,12 @@ Main Logic:
 Main Logic:
 Start Main Logic MAIN_MENU
     Loop forever
-        Print "Main Menu:"
-        Print "1. Administrator Login"
-        Print "2. Staff Login"
-        Print "3. Member Login"
-        Print "4. Guest Access"
-        Print "5. Exit"
+        DISPLAY "Main Menu:"
+        DISPLAY "1. Administrator Login"
+        DISPLAY "2. Staff Login"
+        DISPLAY "3. Member Login"
+        DISPLAY "4. Guest Access"
+        DISPLAY "5. Exit"
         Prompt "Enter your choice (1-5): " and read CHOICE
 
         If CHOICE = "1" Then
@@ -46,10 +49,10 @@ Start Main Logic MAIN_MENU
         Else If CHOICE = "4" Then
             Call GUEST_ACCESS()  // function incomplete
         Else If CHOICE = "5" Then
-            Print "Exiting the program."
+            DISPLAY "Exiting the program."
             Exit Loop
         Else
-            Print "Invalid choice. Please try again."
+            DISPLAY "Invalid choice. Please try again."
 End Main Logic
 ---------------------------------------------------------------------------
 ########################################################################### 
@@ -60,19 +63,19 @@ Password Making Function:
 Start Function PASSWORD_MAKING(password)
     SET special_characters TO ["!", "#", "$", "%", "^", "&", "*", "(", ")", ",", ".", "?", "\"", ":", "{", "}", "|", "<", ">", "-"]
     If LENGTH of password LESS THAN 8 Then
-        PRINT "Password must be at least 8 characters long."
+        DISPLAY "Password must be at least 8 characters long."
         RETURN False
     If No character in password is uppercase Then
-        PRINT "Password must contain at least one uppercase letter."
+        DISPLAY "Password must contain at least one uppercase letter."
         RETURN False
     If No character in password is lowercase Then
-        PRINT "Password must contain at least one lowercase letter."
+        DISPLAY "Password must contain at least one lowercase letter."
         RETURN False
     If there is no number in password Then
-        PRINT "Password must contain at least one digit."
+        DISPLAY "Password must contain at least one digit."
         RETURN False
     If No character from special_characters is in password Then
-        PRINT "Password must contain at least one special character."
+        DISPLAY "Password must contain at least one special character."
         RETURN False
     ELSE RETURN True
 End Function
@@ -104,10 +107,10 @@ Start Function GET_VALID_CONTACT()
                         SET exists TO True
                 Close file
         If exists Then
-            Print "Contact number already exists. Please enter a different number."
+            DISPLAY "Contact number already exists. Please enter a different number."
             Continue Loop
         If LENGTH of input_contact NOT EQUAL TO 10 OR HAS NON_DIGIT_CHARACTERS Then
-            Print "Invalid contact number. Please enter a 10-digit number."
+            DISPLAY "Invalid contact number. Please enter a 10-digit number."
             Continue Loop
         Else Return input_contact
 End Function
@@ -117,7 +120,7 @@ Start Function GET_VALID_NAME()
     Loop forever
         Prompt "Enter name: " and read into NAME
         If character in NAME is a digit or special character Then 
-            Print "Invalid username. It must not contain numbers or special characters."
+            DISPLAY "Invalid username. It must not contain numbers or special characters."
             Continue Loop
         RETURN NAME
 End Function
@@ -133,10 +136,10 @@ Start Function LOCKOUT(locked_out)
         SET remaining_time TO INTEGER((locked_out - current_time) in seconds)
         If remaining_time <= 0 Then
             BREAK Loop
-        Print "Too many incorrect attempts. Please wait " + remaining_time + " seconds."  # display/update on same line if possible
+        DISPLAY "Too many incorrect attempts. Please wait " + remaining_time + " seconds."  # display/update on same line if possible
         WAIT 1 second
     End Loop
-    RETURN
+    Call MAIN_MENU()
 End Function
 ---------------------------------------------------------------------------
 ###########################################################################
@@ -146,12 +149,12 @@ End Function
 #@ Admin Menu Function:
 Start Function ADMIN_MENU(admin)
     Loop forever
-        Print "Admin Menu:"
-        Print "1. Admin Management"
-        Print "2. Staff Management"
-        Print "3. Member Management"
-        Print "4. Repository Management"
-        Print "5. Logout"
+        DISPLAY "Admin Menu:"
+        DISPLAY "1. Admin Management"
+        DISPLAY "2. Staff Management"
+        DISPLAY "3. Member Management"
+        DISPLAY "4. Repository Management"
+        DISPLAY "5. Logout"
         Prompt "Enter your choice (1-5): " and read CHOICE
 
         If CHOICE = "1" Then
@@ -167,11 +170,10 @@ Start Function ADMIN_MENU(admin)
             If Call to REVERIFY_PASSWORD(admin) RETURNS True Then
                 Call MANAGE_REPOSITORY(admin)
         Else If CHOICE = "5" Then
-            Print "Logging out."
+            DISPLAY "Logging out."
             Call MAIN_MENU()
-            RETURN
         Else
-            Print "Invalid choice. Please try again."
+            DISPLAY "Invalid choice. Please try again."
 End Function
 ---------------------------------------------------------------------------
 #@ View Admin Function:
@@ -185,7 +187,7 @@ End Function
 #@ Add Admin Function:
 Start Function ADD_ADMIN(admin)
     Loop forever
-        Print "Admin Registration"
+        DISPLAY "Admin Registration"
         Call GET_VALID_NAME() and store result in NAME
         Call GET_VALID_PASSWORD() and store result in PASSWORD
         Call GET_VALID_CONTACT() and store result in CONTACT
@@ -208,18 +210,17 @@ Start Function ADD_ADMIN(admin)
             Write ADMIN_ID, PASSWORD, SECURITY_PHRASE separated by commas and newline to file
         Close file
         Call ADMIN_TABLE()
-        Print "Admin account set successfully for Admin ID: " + ADMIN_ID
+        DISPLAY "Admin account set successfully for Admin ID: " + ADMIN_ID
     
         # Ask whether to register another admin
         Loop forever
             Prompt "Do you want to register another admin? (y/n): " and read continue_choice
             If continue_choice = "y" Then
                 Call ADD_ADMIN(admin)
-                RETURN
             Else If continue_choice = "n" Then
-                RETURN MANAGE_ADMIN(admin)
+                Call MANAGE_ADMIN(admin)
             Else
-                Print "Invalid choice. Please try again."
+                DISPLAY "Invalid choice. Please try again."
 End Function
 ---------------------------------------------------------------------------
 #@ Remove Admin Function:
@@ -254,8 +255,8 @@ Start Function REMOVE_ADMIN(admin)
         SET selected_admin TO selected_admin stripped
 
         If selected_admin = "cancel" Then
-            Print "Deletion canceled."
-            RETURN CALL MANAGE_ADMIN(admin)
+            DISPLAY "Deletion canceled."
+            Call MANAGE_ADMIN(admin)
 
         # Find indexes of the selected admin in both lists
         SET index_sec TO -1
@@ -270,7 +271,7 @@ Start Function REMOVE_ADMIN(admin)
                 BREAK FOR
 
         If index_sec = -1 OR index_cred = -1 Then
-            Print "No matching ID found."
+            DISPLAY "No matching ID found."
             CONTINUE Loop
 
         # Confirm deletion with user (show credential row)
@@ -278,8 +279,8 @@ Start Function REMOVE_ADMIN(admin)
         Prompt "Are you sure you want to delete this admin: " + JOIN(selected_row, ", ") + " ? (y/n): " and read confirm
         SET confirm TO confirm lowercased
         If confirm != "y" Then
-            Print "Deletion canceled."
-            RETURN CALL MANAGE_ADMIN(admin)
+            DISPLAY "Deletion canceled."
+            Call MANAGE_ADMIN(admin)
 
         # Remove entries from both lists
         REMOVE admin_cred at index_cred
@@ -299,7 +300,7 @@ Start Function REMOVE_ADMIN(admin)
                 Write JOIN(row, ",") and newline to file
         Close file
 
-        Print "Admin removed successfully."
+        DISPLAY "Admin removed successfully."
 
         # Ask whether to delete another admin
         Loop forever
@@ -308,9 +309,9 @@ Start Function REMOVE_ADMIN(admin)
             If continue_choice = "y" Then
                 BREAK the inner loop to restart outer Loop (remove another)
             Else If continue_choice = "n" Then
-                RETURN CALL MANAGE_ADMIN(admin)
+                Call MANAGE_ADMIN(admin)
             Else
-                Print "Invalid choice. Please try again."
+                DISPLAY "Invalid choice. Please try again."
 End Function
 ---------------------------------------------------------------------------
 #@ Password Reset Function:
@@ -332,8 +333,8 @@ Start Function PASSWORD_RESET_ADMIN(admin)
         SET selected_admin TO selected_admin stripped
 
         If selected_admin = "cancel" Then
-            Print "Reset canceled."
-            RETURN CALL MANAGE_ADMIN(admin)
+            DISPLAY "Reset canceled."
+            Call MANAGE_ADMIN(admin)
 
         SET admin_index TO -1
         FOR index FROM 0 TO LENGTH(admin_sec)-1
@@ -342,7 +343,7 @@ Start Function PASSWORD_RESET_ADMIN(admin)
                 BREAK FOR
 
         If admin_index = -1 Then
-            Print "No matching ID found."
+            DISPLAY "No matching ID found."
             CONTINUE Loop
 
         # Show ID and confirmation of password reset
@@ -350,8 +351,8 @@ Start Function PASSWORD_RESET_ADMIN(admin)
         Prompt "Are you sure you want to reset password for this admin: " selected_row[0] + " ? (y/n): " and read confirm
         SET confirm TO confirm lowercased
         If confirm != "y" Then
-            Print "Password Reset Cancelled."
-            RETURN CALL MANAGE_ADMIN(admin)
+            DISPLAY "Password Reset Cancelled."
+            CALL MANAGE_ADMIN(admin)
 
         # Get new password and security phrase
         CALL GET_VALID_PASSWORD() and store result in new_password
@@ -368,7 +369,7 @@ Start Function PASSWORD_RESET_ADMIN(admin)
                 Write JOIN(row, ",") and newline to file
         Close file
 
-        Print "Password reset successfully."
+        DISPLAY "Password reset successfully."
 
         # Ask whether to reset another password
         Loop forever
@@ -377,12 +378,12 @@ Start Function PASSWORD_RESET_ADMIN(admin)
             If continue_choice = "y" Then
                 BREAK the inner loop to restart outer Loop (reset another)
             Else If continue_choice = "n" Then
-                RETURN CALL MANAGE_ADMIN(admin)
+                CALL MANAGE_ADMIN(admin)
             Else
-                Print "Invalid choice. Please try again."
+                DISPLAY "Invalid choice. Please try again."
 End Function
 ---------------------------------------------------------------------------               
-#@Reverify Admin Password Function:
+#@ Reverify Admin Password Function:
 Start Function REVERIFY_PASSWORD(admin)
     SET attempts TO 3
     If FILE_EXISTS(admin_file_P) AND FILE_SIZE(admin_file_P) GREATER THAN 0 Then
@@ -404,23 +405,23 @@ Start Function REVERIFY_PASSWORD(admin)
                                 RETURN True
                             Else
                                 SET attempts TO attempts - 1
-                                Print "Incorrect password or security phrase. You have " + attempts + " attempts left."
+                                DISPLAY "Incorrect password or security phrase. You have " + attempts + " attempts left."
                         # attempts exhausted -GREATER THAN lockout and return to admin menu
                         SET locked_out TO CURRENT_DATETIME + 1 minute
                         Call LOCKOUT(locked_out)
                         SET attempts TO 3
                         Close file
-                        RETURN CALL ADMIN_MENU(admin)
+                        CALL ADMIN_MENU(admin)
             Close file
             If NOT found Then
-                Print "Admin ID not found in password file."
+                DISPLAY "Admin ID not found in password file."
                 RETURN False
     Else
-        Print "Admin password file not found or empty."
+        DISPLAY "Admin password file not found or empty."
         RETURN False
 End Function
 ---------------------------------------------------------------------------
-#@Admin ID Generator Function:
+#@ Admin ID Generator Function:
 Start Function ADMIN_ID_GENERATOR()
     # Generate a new Admin ID (5-digit zero-padded)
     If FILE_EXISTS(admin_file_C) AND FILE_SIZE(admin_file_C) GREATER THAN 0 Then
@@ -432,11 +433,11 @@ Start Function ADMIN_ID_GENERATOR()
         SET new_admin_id TO STRING(num_users + 1) zero-padded to width 5  # e.g., "00001"
     Else
         SET new_admin_id TO "00001"
-    Print "Generated Admin ID: " + new_admin_id
+    DISPLAY "Generated Admin ID: " + new_admin_id
     RETURN new_admin_id
 End Function
 ---------------------------------------------------------------------------
-#@Credential Verification Function:
+#@ Credential Verification Function:
 Start Function CREDENTIAL_VERIFICATION(input_id, input_password, sec_phrase)
     SET input_id TO input_id
     SET input_password TO input_password
@@ -450,17 +451,17 @@ Start Function CREDENTIAL_VERIFICATION(input_id, input_password, sec_phrase)
                 If LENGTH(parts) = 3 Then
                     SET stored_id, stored_password, stored_phrase TO parts
                     If input_id = stored_id AND input_password = stored_password AND sec_phrase = stored_phrase Then
-                        Print "Credentials verified successfully."
+                        DISPLAY "Credentials verified successfully."
                         Close file
                         RETURN True
             Close file
-        Print "Invalid Admin ID or Password."
+        DISPLAY "Invalid Admin ID or Password."
     Else
-        Print "Admin password file not found or empty."
+        DISPLAY "Admin password file not found or empty."
     RETURN False
 End Function
 ---------------------------------------------------------------------------
-#@View Admin Table Functions:
+#@ View Admin Table Functions:
 Start Function ADMIN_TABLE()
     TRY
         If FILE_EXISTS(admin_file_C) AND FILE_SIZE(admin_file_C) GREATER THAN 0 Then
@@ -475,7 +476,7 @@ Start Function ADMIN_TABLE()
             Close file
 
             If admin_data IS EMPTY Then
-                Print "No data to be displayed"
+                DISPLAY "No data to be displayed"
             ELSE
                 # Compute maximum column widths (consider headers and rows)
                 SET max_len TO empty list
@@ -489,19 +490,19 @@ Start Function ADMIN_TABLE()
                 # Build header string using column widths (approximate formatting)
                 SET header_str TO "|" + headers[0] centered width 10 + " | " + headers[1] centered width max_len[1] + " | " + headers[2] centered width 20 + "|"
 
-                # Print table with separators
-                Print REPEAT("-", LENGTH(header_str))
-                Print header_str
-                Print REPEAT("-", LENGTH(header_str))
+                # DISPLAY table with separators
+                DISPLAY REPEAT("-", LENGTH(header_str))
+                DISPLAY header_str
+                DISPLAY REPEAT("-", LENGTH(header_str))
                 For each row in admin_data
-                    Print "|" + row[0] centered width 10 + " | " + row[1] centered width max_len[1] + " | " + row[2] centered width 20 + "|"
-                Print REPEAT("-", LENGTH(header_str))
+                    DISPLAY "|" + row[0] centered width 10 + " | " + row[1] centered width max_len[1] + " | " + row[2] centered width 20 + "|"
+                DISPLAY REPEAT("-", LENGTH(header_str))
         Else
-            Print "Error: '" + admin_file_C + "' file not found or empty."
+            DISPLAY "Error: '" + admin_file_C + "' file not found or empty."
     EXCEPT FileNotFoundError
-        Print "Error: '" + admin_file_C + "' file not found."
+        DISPLAY "Error: '" + admin_file_C + "' file not found."
     EXCEPT Exception AS e
-        Print "An unexpected error occurred: " + STRING(e)
+        DISPLAY "An unexpected error occurred: " + STRING(e)
 End Function
 ---------------------------------------------------------------------------
 #@ Admin Login Function:
@@ -510,29 +511,29 @@ Start Function ADMIN_LOGIN()
     SET locked_out TO None
     # Check password file exists before prompting
     If FILE_NOT_EXISTS(admin_file_P) OR FILE_SIZE(admin_file_P) = 0 Then
-        Print "Error: Admin credential file not found. Please contact system administrator."
-        RETURN CALL MAIN_MENU()
+        DISPLAY "Error: Admin credential file not found. Please contact system administrator."
+        CALL MAIN_MENU()
     Loop While attempts GREATER THAN 0
-        Print "Admin Login"
+        DISPLAY "Admin Login"
         Prompt "Enter Admin ID: " and read input_id
         Prompt "Enter Password: " and read input_password
         Prompt "Enter Security Phrase: " and read sec_phrase
         If Call to CREDENTIAL_VERIFICATION(input_id, input_password, sec_phrase) RETURNS True Then
             SET admin TO [input_id, input_password, sec_phrase]
-            RETURN CALL ADMIN_MENU(admin)
+            CALL ADMIN_MENU(admin)
         # Failed attempt
         SET attempts TO attempts - 1
-        Print "Invalid Admin ID or Password. You have " + STRING(attempts) + " attempts left."
+        DISPLAY "Invalid Admin ID or Password. You have " + STRING(attempts) + " attempts left."
         If attempts = 0 Then
             SET locked_out TO CURRENT_DATETIME + 1 minute
             Call LOCKOUT(locked_out)
             SET attempts TO 3
-            RETURN CALL MAIN_MENU()
+            CALL MAIN_MENU()
     End Loop
 
     # Fallback in case of unexpected situation
-    Print "An unexpected error occurred during admin login."
-    RETURN CALL MAIN_MENU()
+    DISPLAY "An unexpected error occurred during admin login."
+    CALL MAIN_MENU()
 End Function
 ---------------------------------------------------------------------------
 ###########################################################################
@@ -542,14 +543,14 @@ End Function
 #@ Member Manager Menu Function:
 Start Function MANAGE_MEMBERS(admin)
     Loop forever
-        Print "Member Management"
-        Print "1. View Members"
-        Print "2. View Members logs"
-        Print "3. Add Member"
-        Print "4. Remove Member"
-        Print "5. Reset Password"
-        Print "6. Previous Menu"
-        Print "7. Logout"
+        DISPLAY "Member Management"
+        DISPLAY "1. View Members"
+        DISPLAY "2. View Members logs"
+        DISPLAY "3. Add Member"
+        DISPLAY "4. Remove Member"
+        DISPLAY "5. Reset Password"
+        DISPLAY "6. Previous Menu"
+        DISPLAY "7. Logout"
         Prompt "Enter your choice (1-7): " and read CHOICE
 
         If CHOICE = "1" Then
@@ -564,13 +565,11 @@ Start Function MANAGE_MEMBERS(admin)
             Call PASSWORD_RESET_MEMBER(admin)
         Else If CHOICE = "6" Then
             Call ADMIN_MENU(admin)
-            RETURN
         Else If CHOICE = "7" Then
-            Print "Logging Out"
+            DISPLAY "Logging Out"
             Call MAIN_MENU()
-            RETURN
         Else
-            Print "Invalid choice. Please try again."
+            DISPLAY "Invalid choice. Please try again."
 End Function
 ---------------------------------------------------------------------------
 #@Staff ID Generator Function:
@@ -584,7 +583,7 @@ Start Function STAFF_ID_GENERATOR()
         SET new_staff_id TO STRING(num_users + 1) zero-padded to width 5  # e.g., "00001"
     Else
         SET new_staff_id TO "00001"
-    Print "Generated Staff ID: " + new_staff_id
+    DISPLAY "Generated Staff ID: " + new_staff_id
     RETURN new_staff_id
 End Function
 ---------------------------------------------------------------------------
@@ -603,7 +602,7 @@ Start Function STAFF_TABLE()
             Close file
 
             If staff_data IS EMPTY Then
-                Print "No data to be displayed"
+                DISPLAY "No data to be displayed"
             ELSE
                 # Compute maximum column widths (consider headers and rows)
                 SET max_len TO empty list
@@ -617,19 +616,19 @@ Start Function STAFF_TABLE()
                 # Build header string using column widths (approximate formatting)
                 SET header_str TO "|" + headers[0] centered width 10 + " | " + headers[1] centered width max_len[1] + " | " + headers[2] centered width 20 + "|"
 
-                # Print table with separators
-                Print REPEAT("-", LENGTH(header_str))
-                Print header_str
-                Print REPEAT("-", LENGTH(header_str))
+                # DISPLAY table with separators
+                DISPLAY REPEAT("-", LENGTH(header_str))
+                DISPLAY header_str
+                DISPLAY REPEAT("-", LENGTH(header_str))
                 For each row in staff_data
-                    Print "|" + row[0] centered width 10 + " | " + row[1] centered width max_len[1] + " | " + row[2] centered width 20 + "|"
-                Print REPEAT("-", LENGTH(header_str))
+                    DISPLAY "|" + row[0] centered width 10 + " | " + row[1] centered width max_len[1] + " | " + row[2] centered width 20 + "|"
+                DISPLAY REPEAT("-", LENGTH(header_str))
         Else
-            Print "Error: '" + staff_file_C + "' file not found or empty."
+            DISPLAY "Error: '" + staff_file_C + "' file not found or empty."
     EXCEPT FileNotFoundError
-        Print "Error: '" + staff_file_C + "' file not found."
+        DISPLAY "Error: '" + staff_file_C + "' file not found."
     EXCEPT Exception AS e
-        Print "An unexpected error occurred: " + STRING(e)
+        DISPLAY "An unexpected error occurred: " + STRING(e)
 End Function
 ---------------------------------------------------------------------------
 #@ View Staff Functions:
@@ -637,14 +636,14 @@ Start Function VIEW_STAFF(admin)
     Loop forever
         Call STAFF_TABLE()
         Prompt "Press Enter to continue..." and wait for user input
-        RETURN MANAGE_STAFF(admin)
+        MANAGE_STAFF(admin)
 End Function
 ----------------------------------------------------------------------------
 #@ Add Staff Function:
 Start Function ADD_STAFF(admin)
     Loop forever
         TRY
-            Print "Staff Registration"
+            DISPLAY "Staff Registration"
             Call GET_VALID_NAME() and store result in NAME
             Call GET_VALID_PASSWORD() and store result in PASSWORD
             Call GET_VALID_CONTACT() and store result in CONTACT
@@ -670,7 +669,7 @@ Start Function ADD_STAFF(admin)
             Close file
 
             Call STAFF_TABLE()
-            Print "Staff account set successfully for Staff ID: " + STAFF_ID
+            DISPLAY "Staff account set successfully for Staff ID: " + STAFF_ID
 
             # Ask whether to register another staff member
             Loop forever
@@ -678,15 +677,14 @@ Start Function ADD_STAFF(admin)
                 SET continue_choice TO continue_choice lowercased
                 If continue_choice = "y" Then
                     Call ADD_STAFF(admin)
-                    RETURN
                 Else If continue_choice = "n" Then
-                    RETURN CALL MANAGE_STAFF(admin)
+                    Call MANAGE_STAFF(admin)
                 Else
-                    Print "Invalid choice. Please try again."
+                    DISPLAY "Invalid choice. Please try again."
         EXCEPT FileNotFoundError
-            Print "Error: Staff credential file not found. Please contact system administrator."
+            DISPLAY "Error: Staff credential file not found. Please contact system administrator."
         EXCEPT Exception AS e
-            Print "An unexpected error occurred during staff registration: " + STRING(e)
+            DISPLAY "An unexpected error occurred during staff registration: " + STRING(e)
 End Function
 ---------------------------------------------------------------------------
 #@ Remove Staff Function:
@@ -721,8 +719,8 @@ Start Function REMOVE_STAFF(admin)
         SET selected_staff TO selected_staff stripped
 
         If selected_staff = "cancel" Then
-            Print "Deletion canceled."
-            RETURN CALL MANAGE_STAFF(admin)
+            DISPLAY "Deletion canceled."
+            CALL MANAGE_STAFF(admin)
 
         # Find indexes of the selected staff in both lists
         SET index_sec TO -1
@@ -737,7 +735,7 @@ Start Function REMOVE_STAFF(admin)
                 BREAK FOR
 
         If index_sec = -1 OR index_cred = -1 Then
-            Print "No matching ID found."
+            DISPLAY "No matching ID found."
             CONTINUE Loop
 
         # Confirm deletion with user (show credential row)
@@ -745,8 +743,8 @@ Start Function REMOVE_STAFF(admin)
         Prompt "Are you sure you want to delete this staff: " + JOIN(selected_row, ", ") + " ? (y/n): " and read confirm
         SET confirm TO confirm lowercased
         If confirm != "y" Then
-            Print "Deletion canceled."
-            RETURN CALL MANAGE_STAFF(admin)
+            DISPLAY "Deletion canceled."
+            CALL MANAGE_STAFF(admin)
 
         # Remove entries from both lists
         REMOVE staff_cred at index_cred
@@ -766,7 +764,7 @@ Start Function REMOVE_STAFF(admin)
                 Write JOIN(row, ",") and newline to file
         Close file
 
-        Print "Staff removed successfully."
+        DISPLAY "Staff removed successfully."
 
         # Ask whether to delete another staff
         Loop forever
@@ -775,9 +773,9 @@ Start Function REMOVE_STAFF(admin)
             If continue_choice = "y" Then
                 BREAK the inner loop to restart outer Loop (remove another)
             Else If continue_choice = "n" Then
-                RETURN CALL MANAGE_STAFF(admin)
+                CALL MANAGE_STAFF(admin)
             Else
-                Print "Invalid choice. Please try again."
+                DISPLAY "Invalid choice. Please try again."
 End Function
 ---------------------------------------------------------------------------
 #@ Password Reset Staff Function:
@@ -811,8 +809,8 @@ Start Function PASSWORD_RESET_STAFF(admin)
         SET selected_staff TO selected_staff stripped
 
         If selected_staff = "cancel" Then
-            Print "Reset canceled."
-            RETURN CALL MANAGE_STAFF(admin)
+            DISPLAY "Reset canceled."
+            CALL MANAGE_STAFF(admin)
 
         # Find staff index in staff_sec
         SET staff_index TO -1
@@ -822,7 +820,7 @@ Start Function PASSWORD_RESET_STAFF(admin)
                 BREAK FOR
 
         If staff_index = -1 Then
-            Print "No matching ID found."
+            DISPLAY "No matching ID found."
             CONTINUE Loop
 
         # Show selected staff credential row for confirmation
@@ -830,8 +828,8 @@ Start Function PASSWORD_RESET_STAFF(admin)
         Prompt "Are you sure you want to reset password for this staff: " + JOIN(selected_row, ", ") + " ? (y/n): " and read confirm
         SET confirm TO confirm lowercased
         If confirm != "y" Then
-            Print "Password Reset Cancelled."
-            RETURN CALL MANAGE_STAFF(admin)
+            DISPLAY "Password Reset Cancelled."
+            CALL MANAGE_STAFF(admin)
 
         # Get new password and security phrase
         CALL GET_VALID_PASSWORD() and store result in new_password
@@ -848,7 +846,7 @@ Start Function PASSWORD_RESET_STAFF(admin)
                 Write JOIN(row, ",") and newline to file
         Close file
 
-        Print "Password reset successfully."
+        DISPLAY "Password reset successfully."
 
         # Ask whether to reset another password
         Loop forever
@@ -857,9 +855,9 @@ Start Function PASSWORD_RESET_STAFF(admin)
             If continue_choice = "y" Then
                 BREAK the inner loop to restart outer Loop (reset another)
             Else If continue_choice = "n" Then
-                RETURN CALL MANAGE_STAFF(admin)
+                CALL MANAGE_STAFF(admin)
             Else
-                Print "Invalid choice. Please try again."
+                DISPLAY "Invalid choice. Please try again."
 End Function
 ---------------------------------------------------------------------------
 ###########################################################################
@@ -869,13 +867,13 @@ End Function
 #@ Repository Management Menu Function:
 Start Function MANAGE_REPOSITORY(admin)
     Loop forever
-        Print "Repository Management"
-        Print "1. View Repository"
-        Print "2. Add to Repository"
-        Print "3. Remove from Repository"
-        Print "4. Book Logs"
-        Print "5. Previous Menu"
-        Print "6. Logout"
+        DISPLAY "Repository Management"
+        DISPLAY "1. View Repository"
+        DISPLAY "2. Add to Repository"
+        DISPLAY "3. Remove from Repository"
+        DISPLAY "4. Book Logs"
+        DISPLAY "5. Previous Menu"
+        DISPLAY "6. Logout"
         Prompt "Enter your choice (1-6): " and read CHOICE
 
         If CHOICE = "1" Then
@@ -888,13 +886,11 @@ Start Function MANAGE_REPOSITORY(admin)
             Call VIEW_BOOK_LOGS(admin)
         Else If CHOICE = "5" Then
             Call ADMIN_MENU(admin)
-            RETURN
         Else If CHOICE = "6" Then
-            Print "Logging Out"
+            DISPLAY "Logging Out"
             Call MAIN_MENU()
-            RETURN
         Else
-            Print "Invalid choice. Please try again."
+            DISPLAY "Invalid choice. Please try again."
 End Function
 ---------------------------------------------------------------------------
 #@ Repository Table Function:
@@ -912,7 +908,7 @@ Start Function REPOSITORY_TABLE()
             Close file
 
             If repository_data IS EMPTY Then
-                Print "No data to be displayed"
+                DISPLAY "No data to be displayed"
             ELSE
                 # Compute maximum column widths (consider headers and rows)
                 SET max_length TO empty list
@@ -926,25 +922,25 @@ Start Function REPOSITORY_TABLE()
                 # Build header string using column widths (approximate formatting)
                 SET header_str TO "|" + headers[0] centered width 10 + " | " + headers[1] centered width 15 + " | " + headers[2] centered width (max_length[2] + 1) + "| " + headers[3] centered width 20 + "| " + headers[4] centered width 20 + "|"
 
-                # Print table with separators
-                Print REPEAT("-", LENGTH(header_str))
-                Print header_str
-                Print REPEAT("-", LENGTH(header_str))
+                # DISPLAY table with separators
+                DISPLAY REPEAT("-", LENGTH(header_str))
+                DISPLAY header_str
+                DISPLAY REPEAT("-", LENGTH(header_str))
                 For each row in repository_data
-                    Print "|" + row[0] centered width 10 + " | " + row[1] centered width 15 + " | " + row[2] left-aligned width (max_length[2] + 1) + "| " + row[3] centered width 20 + " | " + row[4] centered width 20 + "|"
-                Print REPEAT("-", LENGTH(header_str))
+                    DISPLAY "|" + row[0] centered width 10 + " | " + row[1] centered width 15 + " | " + row[2] left-aligned width (max_length[2] + 1) + "| " + row[3] centered width 20 + " | " + row[4] centered width 20 + "|"
+                DISPLAY REPEAT("-", LENGTH(header_str))
         Else
-            Print "Error: '" + repository + "' file not found or empty."
+            DISPLAY "Error: '" + repository + "' file not found or empty."
     EXCEPT FileNotFoundError
-        Print "Error: '" + repository + "' file not found."
+        DISPLAY "Error: '" + repository + "' file not found."
     EXCEPT Exception AS e
-        Print "An unexpected error occurred: " + STRING(e)
+        DISPLAY "An unexpected error occurred: " + STRING(e)
 End Function
 ---------------------------------------------------------------------------
 #@ ISBN Checker Function:
 Start Function ISBN_CHECKER(isbn)
     Loop While NOT (ALL_CHARACTERS_IN(isbn) ARE_DIGITS AND LENGTH of isbn = 13)
-        Print "Invalid ISBN. Please enter a 13-digit numeric ISBN."
+        DISPLAY "Invalid ISBN. Please enter a 13-digit numeric ISBN."
         Prompt "Enter ISBN (13 digits): " and read isbn
     End Loop 
     RETURN isbn
@@ -962,7 +958,7 @@ Start Function BOOK_ID_GENERATOR()
         SET new_book_id TO "B" + STRING(num_books + 1) zero-padded to width 4  # e.g., "B0001"
     Else
         SET new_book_id TO "B0001"
-    Print "Generated Book ID: " + new_book_id
+    DISPLAY "Generated Book ID: " + new_book_id
     RETURN new_book_id
 End Function
 ---------------------------------------------------------------------------
@@ -971,15 +967,15 @@ Start Function VIEW_REPOSITORY(admin)
     Loop forever
         Call REPOSITORY_TABLE()
         Prompt "Press Enter to continue..." and wait for user input
-        RETURN CALL MANAGE_REPOSITORY(admin)
+        CALL MANAGE_REPOSITORY(admin)
 End Function
 ---------------------------------------------------------------------------
 #@ Add Repository Function:
 Start Function ADD_REPOSITORY(admin)
     TRY
         Loop forever
-            Print "Add to Repository"
-            Print "Type 'cancel' at any prompt to cancel the operation."
+            DISPLAY "Add to Repository"
+            DISPLAY "Type 'cancel' at any prompt to cancel the operation."
 
             # Generate Book ID
             Call BOOK_ID_GENERATOR() and store result in BOOK_ID
@@ -987,21 +983,21 @@ Start Function ADD_REPOSITORY(admin)
             # Get ISBN and validate / allow cancel
             Prompt "Enter ISBN (13 digits): " and read ISBN_INPUT
             If ISBN_INPUT lowercased = "cancel" Then
-                Print "Operation canceled."
-                RETURN CALL MANAGE_REPOSITORY(admin)
+                DISPLAY "Operation canceled."
+                CALL MANAGE_REPOSITORY(admin)
             Call ISBN_CHECKER(ISBN_INPUT) and store result in ISBN
 
             # Get Book Name and allow cancel
             Prompt "Enter Book Name: " and read NAME
             If NAME lowercased = "cancel" Then
-                Print "Operation canceled."
-                RETURN CALL MANAGE_REPOSITORY(admin)
+                DISPLAY "Operation canceled."
+                CALL MANAGE_REPOSITORY(admin)
 
             # Get Category and allow cancel
             Prompt "Enter Book Category: " and read CATEGORY
             If CATEGORY lowercased = "cancel" Then
-                Print "Operation canceled."
-                RETURN CALL MANAGE_REPOSITORY(admin)
+                DISPLAY "Operation canceled."
+                CALL MANAGE_REPOSITORY(admin)
 
             SET AVAILABILITY TO "Available"
             SET new_book_row TO [BOOK_ID, ISBN, NAME, CATEGORY, AVAILABILITY]
@@ -1017,7 +1013,7 @@ Start Function ADD_REPOSITORY(admin)
                 Write JOIN(new_book_row, ",") and newline to file
             Close file
 
-            Print "Book added to repository successfully."
+            DISPLAY "Book added to repository successfully."
 
             # Ask whether to add another book
             Loop forever
@@ -1025,14 +1021,13 @@ Start Function ADD_REPOSITORY(admin)
                 SET continue_choice TO continue_choice lowercased
                 If continue_choice = "y" Then
                     Call ADD_REPOSITORY(admin)
-                    RETURN
                 Else If continue_choice = "n" Then
-                    RETURN CALL MANAGE_REPOSITORY(admin)
+                    CALL MANAGE_REPOSITORY(admin)
                 Else
-                    Print "Invalid choice. Please try again."
+                    DISPLAY "Invalid choice. Please try again."
     EXCEPT Exception AS e
-        Print "An error occurred while adding to the repository: " + STRING(e)
-        RETURN CALL MANAGE_REPOSITORY(admin)
+        DISPLAY "An error occurred while adding to the repository: " + STRING(e)
+        CALL MANAGE_REPOSITORY(admin)
 End Function
 ---------------------------------------------------------------------------
 #@ Remove Repository Function:
@@ -1053,15 +1048,15 @@ Start Function REMOVE_BOOK(admin)
                         APPEND parts TO book_data
             Close file
         Else
-            Print "Error: '" + repository + "' file not found or empty."
-            RETURN CALL MANAGE_REPOSITORY(admin)
+            DISPLAY "Error: '" + repository + "' file not found or empty."
+            CALL MANAGE_REPOSITORY(admin)
 
         Prompt "\nEnter Book ID to remove (or type 'cancel' to abort): " and read selected_book
         SET selected_book TO selected_book stripped
 
         If selected_book lowercased = "cancel" Then
-            Print "Removal canceled."
-            RETURN CALL MANAGE_REPOSITORY(admin)
+            DISPLAY "Removal canceled."
+            CALL MANAGE_REPOSITORY(admin)
 
         # Find index of selected book
         SET book_index TO -1
@@ -1071,7 +1066,7 @@ Start Function REMOVE_BOOK(admin)
                 BREAK FOR
 
         If book_index = -1 Then
-            Print "No matching Book ID found."
+            DISPLAY "No matching Book ID found."
             CONTINUE Loop
 
         # Confirm deletion with user (show book row)
@@ -1079,8 +1074,8 @@ Start Function REMOVE_BOOK(admin)
         Prompt "Are you sure you want to delete this book: " + JOIN(selected_book_row, ", ") + " ? (y/n): " and read confirm
         SET confirm TO confirm lowercased
         If confirm != "y" Then
-            Print "Deletion canceled."
-            RETURN CALL MANAGE_REPOSITORY(admin)
+            DISPLAY "Deletion canceled."
+            CALL MANAGE_REPOSITORY(admin)
 
         # Remove book from list
         REMOVE book_data at book_index
@@ -1092,7 +1087,7 @@ Start Function REMOVE_BOOK(admin)
                 Write JOIN(row, ",") and newline to file
         Close file
 
-        Print "Book removed successfully."
+        DISPLAY "Book removed successfully."
 
         # Ask whether to delete another book
         Loop forever
@@ -1101,9 +1096,9 @@ Start Function REMOVE_BOOK(admin)
             If continue_choice = "y" Then
                 BREAK the inner loop to restart outer Loop (remove another)
             Else If continue_choice = "n" Then
-                RETURN CALL MANAGE_REPOSITORY(admin)
+                CALL MANAGE_REPOSITORY(admin)
             Else
-                Print "Invalid choice. Please try again."
+                DISPLAY "Invalid choice. Please try again."
 End Function
 ---------------------------------------------------------------------------
 #@ Book Logs Function:
@@ -1121,7 +1116,7 @@ Start Function VIEW_BOOK_LOGS(admin)
             Close file
 
             If BookLog_Data IS EMPTY Then
-                Print "No data to be displayed"
+                DISPLAY "No data to be displayed"
             ELSE
                 # Compute maximum column widths (consider headers and rows)
                 SET max_length TO empty list
@@ -1136,32 +1131,29 @@ Start Function VIEW_BOOK_LOGS(admin)
                 # Adjust column widths as needed (example widths below use computed max_length)
                 SET header_str TO "|" + headers[0] centered width 10 + "|" + headers[1] centered width 10 + "|" + headers[2] centered width (max_length[2] + 1) + "|" + headers[3] centered width 15 + "|" + headers[4] centered width 15 + "|" + headers[5] centered width 15 + "|"
 
-                # Print table with separators
-                Print REPEAT("-", LENGTH(header_str))
-                Print header_str
-                Print REPEAT("-", LENGTH(header_str))
+                # DISPLAY table with separators
+                DISPLAY REPEAT("-", LENGTH(header_str))
+                DISPLAY header_str
+                DISPLAY REPEAT("-", LENGTH(header_str))
                 For each row in BookLog_Data
-                    Print "|" + row[0] centered width 10 + "|" + row[1] centered width 10 + "|" + row[2] left-aligned width (max_length[2] + 1) + "|" + row[3] centered width 15 + "|" + row[4] centered width 15 + "|" + row[5] centered width 15 + "|"
-                Print REPEAT("-", LENGTH(header_str))
+                    DISPLAY "|" + row[0] centered width 10 + "|" + row[1] centered width 10 + "|" + row[2] left-aligned width (max_length[2] + 1) + "|" + row[3] centered width 15 + "|" + row[4] centered width 15 + "|" + row[5] centered width 15 + "|"
+                DISPLAY REPEAT("-", LENGTH(header_str))
 
         Else
-            Print "Error: '" + BookLog + "' file not found or empty."
+            DISPLAY "Error: '" + BookLog + "' file not found or empty."
     EXCEPT FileNotFoundError
-        Print "Error: '" + BookLog + "' file not found."
+        DISPLAY "Error: '" + BookLog + "' file not found."
     EXCEPT Exception AS e
-        Print "An unexpected error occurred: " + STRING(e)
+        DISPLAY "An unexpected error occurred: " + STRING(e)
 
     Prompt "Press Enter to continue..." and wait for user input
-    RETURN CALL MANAGE_REPOSITORY(admin)
+    CALL MANAGE_REPOSITORY(admin)
 End Function
 ---------------------------------------------------------------------------
 ###########################################################################
 #@ LIBRARY STAFF: Management Section: @#
 ###########################################################################
 ---------------------------------------------------------------------------
-
-
-
 
 
 
@@ -1184,13 +1176,13 @@ Start Function MEMBER_CREDENTIAL_VERIFICATION(input_id, input_password, sec_phra
                 If LENGTH(parts) = 3 Then
                     SET stored_id, stored_password, stored_phrase TO parts
                     If input_id = stored_id AND input_password = stored_password AND sec_phrase = stored_phrase Then
-                        Print "Credentials verified successfully."
+                        DISPLAY "Credentials verified successfully."
                         Close file
                         RETURN True
             Close file
-        Print "Invalid Member ID or Password."
+        DISPLAY "Invalid Member ID or Password."
     Else
-        Print "Member password file not found or empty."
+        DISPLAY "Member password file not found or empty."
     RETURN False
 End Function
 ---------------------------------------------------------------------------
@@ -1201,43 +1193,43 @@ Start Function MEMBER_LOGIN()
 
     # Ensure member password file exists before prompting
     If FILE_NOT_EXISTS(member_file_P) OR FILE_SIZE(member_file_P) = 0 Then
-        Print "Error: Member credential file not found. Please contact system administrator."
-        RETURN CALL MAIN_MENU()
+        DISPLAY "Error: Member credential file not found. Please contact system administrator."
+        CALL MAIN_MENU()
 
     Loop While attempts GREATER THAN 0
-        Print "Member Login"
+        DISPLAY "Member Login"
         Prompt "Enter Member ID: " and read input_id
         Prompt "Enter Password: " and read input_password
         Prompt "Enter Security Phrase: " and read sec_phrase
 
         If Call to MEMBER_CREDENTIAL_VERIFICATION(input_id, input_password, sec_phrase) RETURNS True Then
             SET member TO [input_id, input_password, sec_phrase]
-            Print "Login successful, Welcome Member " + input_id
-            RETURN CALL MEMBER_MENU(member)
+            DISPLAY "Login successful, Welcome Member " + input_id
+            CALL MEMBER_MENU(member)
 
         # Failed attempt
         SET attempts TO attempts - 1
-        Print "Invalid Member ID or Password. You have " + STRING(attempts) + " attempts left."
+        DISPLAY "Invalid Member ID or Password. You have " + STRING(attempts) + " attempts left."
 
         If attempts = 0 Then
             SET locked_out TO CURRENT_DATETIME + 1 minute
             Call LOCKOUT(locked_out)
             SET attempts TO 3
-            RETURN CALL MAIN_MENU()
+            CALL MAIN_MENU()
     End Loop
 
     # Fallback in case of unexpected situation
-    Print "An unexpected error occurred during member login."
-    RETURN CALL MAIN_MENU()
+    DISPLAY "An unexpected error occurred during member login."
+    CALL MAIN_MENU()
 End Function
 ----------------------------------------------------------------------------
 #@ Member Menu Function:
 Start Function MEMBER_MENU(member)
     Loop forever
-        Print "Member Menu:"
-        Print "1. Borrow a Book"
-        Print "2. View Book History"
-        Print "3. Logout"
+        DISPLAY "Member Menu:"
+        DISPLAY "1. Borrow a Book"
+        DISPLAY "2. View Book History"
+        DISPLAY "3. Logout"
         Prompt "Enter your choice (1-3): " and read CHOICE
 
         If CHOICE = "1" Then
@@ -1245,11 +1237,11 @@ Start Function MEMBER_MENU(member)
         Else If CHOICE = "2" Then
             Call VIEW_MEMBER_BOOK_HISTORY(member)
         Else If CHOICE = "3" Then
-            Print "Logging out."
+            DISPLAY "Logging out."
             Call MAIN_MENU()
             RETURN
         Else
-            Print "Invalid choice. Please try again."
+            DISPLAY "Invalid choice. Please try again."
 End Function
 ----------------------------------------------------------------------------
 #@ Borrow Book Function:
@@ -1269,15 +1261,15 @@ Start Function BORROW_BOOK(member)
                             APPEND parts TO book_data
                 Close file
             Else
-                Print "Error: '" + repository + "' file not found or empty."
-                RETURN CALL MEMBER_MENU(member)
+                DISPLAY "Error: '" + repository + "' file not found or empty."
+                CALL MEMBER_MENU(member)
 
             Prompt "\nEnter Book ID to borrow (or type 'cancel' to abort): " and read selected_book
             SET selected_book TO selected_book stripped
 
             If selected_book lowercased = "cancel" Then
-                Print "Borrowing canceled."
-                RETURN CALL MEMBER_MENU(member)
+                DISPLAY "Borrowing canceled."
+                CALL MEMBER_MENU(member)
 
             # Find selected book index
             SET book_index TO -1
@@ -1287,7 +1279,7 @@ Start Function BORROW_BOOK(member)
                     BREAK FOR
 
             If book_index = -1 Then
-                Print "No matching Book ID found."
+                DISPLAY "No matching Book ID found."
                 CONTINUE Loop
 
             # Confirm borrowing with user (show book row)
@@ -1295,8 +1287,8 @@ Start Function BORROW_BOOK(member)
             Prompt "Are you sure you want to borrow this book: " + JOIN(selected_book_row, ", ") + " ? (y/n): " and read confirm
             SET confirm TO confirm lowercased
             If confirm != "y" Then
-                Print "Borrowing canceled."
-                RETURN CALL MEMBER_MENU(member)
+                DISPLAY "Borrowing canceled."
+                CALL MEMBER_MENU(member)
 
             # Update repository entry and create book log entry
             SET borrow_date TO CURRENT_DATE formatted as "YYYY-MM-DD"
@@ -1321,7 +1313,7 @@ Start Function BORROW_BOOK(member)
                     Write JOIN(row, ",") and newline to file
             Close file
 
-            Print "Book borrowed successfully."
+            DISPLAY "Book borrowed successfully."
 
             # Ask whether to borrow another book
             Loop forever
@@ -1330,18 +1322,18 @@ Start Function BORROW_BOOK(member)
                 If continue_choice = "y" Then
                     BREAK the inner loop to restart outer Loop (borrow another)
                 Else If continue_choice = "n" Then
-                    RETURN CALL MEMBER_MENU(member)
+                    CALL MEMBER_MENU(member)
                 Else
-                    Print "Invalid choice. Please try again."
+                    DISPLAY "Invalid choice. Please try again."
     EXCEPT Exception AS e
-        Print "An error occurred while borrowing the book: " + STRING(e)
-        RETURN CALL MEMBER_MENU(member)
+        DISPLAY "An error occurred while borrowing the book: " + STRING(e)
+        CALL MEMBER_MENU(member)
 End Function
 ----------------------------------------------------------------------------    
 #@ View Member Book History Function:
 Start Function VIEW_MEMBER_BOOK_HISTORY(member)
     TRY
-        Print "Member " + member[0] + " Book History:"
+        DISPLAY "Member " + member[0] + " Book History:"
 
         If FILE_EXISTS(BookLog) AND FILE_SIZE(BookLog) GREATER THAN 0 Then
             Open BookLog for reading as file
@@ -1355,7 +1347,7 @@ Start Function VIEW_MEMBER_BOOK_HISTORY(member)
             Close file
 
             If BookLog_Data IS EMPTY Then
-                Print "No data to be displayed"
+                DISPLAY "No data to be displayed"
             ELSE
                 # Filter rows for this member
                 SET filtered_log_lines TO empty list
@@ -1364,7 +1356,7 @@ Start Function VIEW_MEMBER_BOOK_HISTORY(member)
                         APPEND row TO filtered_log_lines
 
                 If filtered_log_lines IS EMPTY Then
-                    Print "No data to be displayed"
+                    DISPLAY "No data to be displayed"
                 ELSE
                     # Compute maximum column widths (consider headers and filtered rows)
                     SET max_length TO empty list
@@ -1378,24 +1370,24 @@ Start Function VIEW_MEMBER_BOOK_HISTORY(member)
                     # Build header string using computed column widths
                     SET header_str TO "|" + headers[0] centered width 10 + "|" + headers[1] centered width 10 + "|" + headers[2] centered width (max_length[2] + 1) + "|" + headers[3] centered width 15 + "|" + headers[4] centered width 15 + "|" + headers[5] centered width 15 + "|"
 
-                    # Print table with separators
-                    Print REPEAT("-", LENGTH(header_str))
-                    Print header_str
-                    Print REPEAT("-", LENGTH(header_str))
+                    # DISPLAY table with separators
+                    DISPLAY REPEAT("-", LENGTH(header_str))
+                    DISPLAY header_str
+                    DISPLAY REPEAT("-", LENGTH(header_str))
                     For each row in filtered_log_lines
-                        Print "|" + row[0] centered width 10 + "|" + row[1] centered width 10 + "|" + row[2] left-aligned width (max_length[2] + 1) + "|" + row[3] centered width 15 + "|" + row[4] centered width 15 + "|" + row[5] centered width 15 + "|"
-                    Print REPEAT("-", LENGTH(header_str))
+                        DISPLAY "|" + row[0] centered width 10 + "|" + row[1] centered width 10 + "|" + row[2] left-aligned width (max_length[2] + 1) + "|" + row[3] centered width 15 + "|" + row[4] centered width 15 + "|" + row[5] centered width 15 + "|"
+                    DISPLAY REPEAT("-", LENGTH(header_str))
         Else
-            Print "Error: '" + BookLog + "' file not found or empty."
+            DISPLAY "Error: '" + BookLog + "' file not found or empty."
 
         Prompt "Press Enter to continue..." and wait for user input
-        RETURN CALL MEMBER_MENU(member)
+        CALL MEMBER_MENU(member)
     EXCEPT FileNotFoundError
-        Print "Error: Book Logs file not found."
-        RETURN CALL MEMBER_MENU(member)
+        DISPLAY "Error: Book Logs file not found."
+        CALL MEMBER_MENU(member)
     EXCEPT Exception AS e
-        Print "An unexpected error occurred while viewing book history: " + STRING(e)
-        RETURN CALL MEMBER_MENU(member)
+        DISPLAY "An unexpected error occurred while viewing book history: " + STRING(e)
+        CALL MEMBER_MENU(member)
 End Function
 ----------------------------------------------------------------------------
 #@ Member Reverify Password Function:
@@ -1421,19 +1413,19 @@ Start Function REVERIFY_MEMBER_PASSWORD(member)
                                 RETURN True
                             Else
                                 SET attempts TO attempts - 1
-                                Print "Incorrect password or security phrase. You have " + STRING(attempts) + " attempts left."
+                                DISPLAY "Incorrect password or security phrase. You have " + STRING(attempts) + " attempts left."
                         # attempts exhausted - lockout then return to member menu
                         SET locked_out TO CURRENT_DATETIME + 1 minute
                         Call LOCKOUT(locked_out)
                         SET attempts TO 3
                         Close file
-                        RETURN CALL MEMBER_MENU(member)
+                        CALL MEMBER_MENU(member)
             Close file
             If NOT found Then
-                Print "Member ID not found in password file."
+                DISPLAY "Member ID not found in password file."
                 RETURN False
     Else
-        Print "Member password file not found or empty."
+        DISPLAY "Member password file not found or empty."
         RETURN False
 End Function
 ----------------------------------------------------------------------------

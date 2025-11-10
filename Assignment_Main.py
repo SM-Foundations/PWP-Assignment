@@ -52,6 +52,7 @@ def lockout(locked_out):
             break
         print(f"Too many incorrect attempts. Please wait {remaining_time} seconds.", end='\r')
         time.sleep(1)
+        return main_menu()
         
 ##################################################################################################
 #@General Utility Functions:

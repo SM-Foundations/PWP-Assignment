@@ -12,6 +12,9 @@ member_file_P = "Member Password.txt"
 repository = "Book_Collection.txt"
 BookLog = "Book_Logs.txt"
 
+##NOTE##
+#@ Master Credentials for all users are as follows: 1,1,1 @#
+
 #@Main Menu Function do not delete or modify this function
 def main_menu():
     while True:
@@ -25,7 +28,7 @@ def main_menu():
         if choice == '1':
             admin_login()
         elif choice == '2':
-            staff_login()
+            staff_login() 
         elif choice == '3':
             member_login()
         elif choice == '4':
@@ -1097,12 +1100,174 @@ def view_book_logs(admin):
 #@Library Staff Section:
 ##################################################################################################
 #Staff Login Function:
+BookList = [
+    {
+        "BookID": "B001",
+        "Title": "math textbook",
+        "Author": "Chew Lee Kuen",
+        "ISBN": "1234567890123",
+        "Status": "Available",
+        "Borrower": None,
+        "IssueDate": None,
+        "DueDate": None
+    },
+    {
+        "BookID": "B002",
+        "Title": "English textbook",
+        "Author": "James Matthew Barrie",
+        "ISBN": "0987654321123",
+        "Status": "Issued",
+        "Borrower": "M002",
+        "IssueDate": "2025-10-20",
+        "DueDate": "2025-11-03"
+    }
+]
 
 
+def IssueBook(MemberID, BookID, IssueDate, DueDate):
+    for book in BookList:
+        if book["BookID"] == BookID:
+            if book["Status"] == "Available":
+                book["Status"] = "Issued"
+                book["Borrower"] = MemberID
+                book["IssueDate"] = IssueDate
+                book["DueDate"] = DueDate
+                print("Book issued successfully.")
+            else:
+                print("Book is not available.")
+            return
+    print("Book ID not found.")
 
 
+def ReturnBook(BookID):
+    for book in BookList:
+        if book["BookID"] == BookID:
+            if book["Status"] == "Issued":
+                book["Status"] = "Available"
+                book["Borrower"] = None
+                book["IssueDate"] = None
+                book["DueDate"] = None
+                print("Book returned successfully.")
+            else:
+                print("Book is not currently issued.")
+            return
+    print("Book ID not found.")
 
 
+def SearchBook(SearchType, SearchValue):
+    found = False
+    for book in BookList:
+        if (SearchType.lower() == "title" and book["Title"].lower() == SearchValue.lower()) or \
+           (SearchType.lower() == "author" and book["Author"].lower() == SearchValue.lower()) or \
+           (SearchType.lower() == "isbn" and book["ISBN"] == SearchValue):
+            print("\nBook Found:")
+            print("Book ID:", book["BookID"])
+            print("Title:", book["Title"])
+            print("Author:", book["Author"])
+            print("ISBN:", book["ISBN"])
+            print("Status:", book["Status"])
+            found = True
+    if not found:
+        print("No book found.")
+
+
+def ReportIssuedBooks():
+    print("\nList of Currently Issued Books:")
+    found = False
+    for book in BookList:
+        if book["Status"] == "Issued":
+            print("----------------------------")
+            print("Book ID:", book["BookID"])
+            print("Title:", book["Title"])
+            print("Borrower ID:", book["Borrower"])
+            print("Due Date:", book["DueDate"])
+            found = True
+    if not found:
+        print("No books are currently issued.")
+
+
+def PaymentSystem(BookID, ReturnDate):
+    from datetime import datetime
+
+    for book in BookList:
+        if book["BookID"] == BookID and book["Status"] == "Issued":
+            due_date = datetime.strptime(book["DueDate"], "%Y-%m-%d")
+            return_date = datetime.strptime(ReturnDate, "%Y-%m-%d")
+            days_late = (return_date - due_date).days
+
+            if days_late > 0:
+                fine = days_late * 1.00  # RM1 per day late
+                print(f"Book is overdue by {days_late} days.")
+                print(f"Total fine = RM {fine:.2f}")
+            else:
+                print("No fine. Returned on time.")
+            return
+    print("Book not found or not issued.")
+
+
+def StockCheckingSystem():
+    available_count = 0
+    issued_count = 0
+
+    for book in BookList:
+        if book["Status"] == "Available":
+            available_count += 1
+        elif book["Status"] == "Issued":
+            issued_count += 1
+
+    print("\nStock Summary:")
+    print("Available Books:", available_count)
+    print("Issued Books:", issued_count)
+
+
+def Staff_Menu():
+    while True:
+        print("\n========== LIBRARY MANAGEMENT SYSTEM ==========")
+        print("1. Issue Book")
+        print("2. Return Book")
+        print("3. Search Book")
+        print("4. Report Issued Books")
+        print("5. Payment System")
+        print("6. Stock Checking System")
+        print("7. Exit")
+        print("==============================================")
+
+        choice = input("Enter your choice (1-7): ")
+
+        if choice == "1":
+            member = input("Enter Member ID: ")
+            book_id = input("Enter Book ID: ")
+            issue_date = input("Enter Issue Date (YYYY-MM-DD): ")
+            due_date = input("Enter Due Date (YYYY-MM-DD): ")
+            IssueBook(member, book_id, issue_date, due_date)
+
+        elif choice == "2":
+            book_id = input("Enter Book ID: ")
+            ReturnBook(book_id)
+
+        elif choice == "3":
+            s_type = input("Search by (Title/Author/ISBN): ")
+            s_value = input("Enter search value: ")
+            SearchBook(s_type, s_value)
+
+        elif choice == "4":
+            ReportIssuedBooks()
+
+        elif choice == "5":
+            book_id = input("Enter Book ID: ")
+            return_date = input("Enter Return Date (YYYY-MM-DD): ")
+            PaymentSystem(book_id, return_date)
+
+        elif choice == "6":
+            StockCheckingSystem()
+
+        elif choice == "7":
+            print("Exiting Library System...")
+            print("thanks you please come agian !")
+            break
+
+        else:
+            print("Invalid choice. Please try again.")
 
 ##################################################################################################
 #@ Member Section: @# @ SAEED
@@ -1139,7 +1304,7 @@ def member_login():
             sec_phrase = input("Enter Security Phrase: ")
             if member_credential_verification(input_id, input_password, sec_phrase):
                 member = (input_id, input_password, sec_phrase)
-                print(member)
+                print("Login successful, Welcome Member " + input_id)
                 return member_menu(member)
             print(
                 f"Invalid Member ID or Password. You have {attempts - 1} attempts left."
@@ -1169,35 +1334,8 @@ def member_menu(member):
         choice = input("Enter your choice (1-4): ")
         if choice == "1":
             return borrow_book(member)
-
         elif choice == "2":
-            with open("Book Logs.txt") as log_file:
-                user_log_lines = log_file.readlines()
-
-            # Filter user_log_lines to only include lines with member id
-            filtered_log_lines = []
-            for line in user_log_lines:
-                parts = line.strip().split(",")
-                if len(parts) > 0 and parts[0] == member[0]:
-                    filtered_log_lines.append(line)
-            user_log_lines = filtered_log_lines
-
-            # Filter to only include the first instence of each book using BookID
-            # Filter to only include the first instance of each book using BookID
-            seen_book_ids = []
-            unique_log_lines = []
-            for line in user_log_lines:
-                parts = line.strip().split(",")
-                if len(parts) > 1:
-                    book_id = parts[1]
-                    if book_id not in seen_book_ids:
-                        seen_book_ids.append(book_id)
-                        unique_log_lines.append(line)
-            user_log_lines = unique_log_lines
-
-            for line in user_log_lines:
-                print("\t||\t".join(line.strip().split(",")[1:]))
-
+            return view_member_book_history(member)
         elif choice == "3":
             print("Logging out.")
             return main_menu()
@@ -1235,10 +1373,12 @@ def borrow_book(member):
                 borrow_date = datetime.datetime.now().strftime("%Y-%m-%d")
                 book_data[book_index][4] = 'Borrowed'
                 book_data[book_index].append(borrow_date)
+                BookLog_entry = f"{member[0]},{selected_book_row[0]},{selected_book_row[2]},{selected_book_row[3]},{borrow_date}\n"
+                if not os.path.exists(BookLog) or os.path.getsize(BookLog) == 0:
+                    with open(BookLog, "a", newline="\n", encoding="utf-8") as file:
+                        file.write("MemberID,BookID,BookName,Category,BorrowDate\n")
                 with open(BookLog, "a", newline="\n", encoding="utf-8") as file:
-                    if os.path.getsize(BookLog) == 0:
-                        file.write("MemberID,BookID,Name,Category,Status,BorrowDate\n")
-                    file.write(f"{member[0]},{selected_book_row[0]},{selected_book_row[2]},{selected_book_row[3]},Borrowed,{borrow_date}\n")
+                    file.write(BookLog_entry)
                 with open(repository, 'w', encoding='utf-8') as file:
                     file.write(','.join(headers) + '\n')
                     for row in book_data:
@@ -1255,9 +1395,39 @@ def borrow_book(member):
         print(f"An error occurred while borrowing the book: {e}")
         return member_menu(member)
              
-        
-
-
+def view_member_book_history(member):
+    try:
+        print(f"Member {member[0]} Book History:")
+        with open(BookLog, "r", encoding="utf-8") as log_file:
+            lines = log_file.readlines()
+            filtered_log_lines = []
+            headers = lines[0].strip().split(',')
+            BookLog_Data = [
+                line.strip().split(',')
+                for line in lines[1:]
+                if len(line.strip().split(',')) == len(headers)
+                ]
+            if not BookLog_Data:
+                print("No data to be displayed")
+            for row in BookLog_Data:
+                if row[0] == member[0]:
+                    filtered_log_lines.append(row)
+            max_length = [max(len(row[i]) for row in filtered_log_lines + [headers]) for i in range(len(headers))]
+            headers = (f"|{headers[0]:^10}|{headers[1]:^10}|{headers[2]:^{max_length[2]+1}}|{headers[3]:^15}|{headers[4]:^15}|{headers[5]:^15}|")
+            print(len(headers)*"-")
+            print(headers)
+            print(len(headers)*"-")
+            for row in filtered_log_lines:
+                print(f"|{row[0]:^10}|{row[1]:^10}|{row[2]:^{max_length[2]+1}}|{row[3]:^15}|{row[4]:^15}|{row[5]:^15}|")
+            print(len(headers)*"-")
+        input("Press Enter to continue...")
+        return member_menu(member)
+    except FileNotFoundError:  
+        print("Error: Book Logs file not found.")
+        return member_menu(member)
+    except Exception as e:
+        print(f"An unexpected error occurred while viewing book history: {e}")
+        return member_menu(member)
 
 #@ Member Reverify Password Function:
 def member_reverify_password(member):
@@ -1302,6 +1472,6 @@ def member_reverify_password(member):
 #@ DO NOT DELETE #@
 def main():
     while True:
-       main_menu()
+       view_member_book_history(member=('00001', 'Wasd123!', 'Mithril'))
 if __name__ == "__main__":
     main()

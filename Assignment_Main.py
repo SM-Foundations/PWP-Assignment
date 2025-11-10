@@ -1,3 +1,4 @@
+from enum import member
 import os
 import time
 import datetime
@@ -28,11 +29,11 @@ def main_menu():
         if choice == '1':
             admin_login()
         elif choice == '2':
-            staff_login() 
+            staff_login() #Incomplete function
         elif choice == '3':
             member_login()
         elif choice == '4':
-            guest_access()
+            guest_access() #Incomplete function
         elif choice == '5':
             print("Exiting the program.")
             break
@@ -40,7 +41,7 @@ def main_menu():
             print("Invalid choice. Please try again.")
 
 ##################################################################################################
-#@Miscellaneous Functions: @#
+#@ Extra Functions: @#
 ##################################################################################################
 #lockout Function:
 def lockout(locked_out):
@@ -55,7 +56,7 @@ def lockout(locked_out):
 ##################################################################################################
 #@General Utility Functions:
 ##################################################################################################
-#@Password Making Function:
+#@ Password Making Function:
 def password_making(password):
     special_characters = ["!","#","$","%","^","&","*","(",")",",",".","?","\"",":","{","}","|","<",">","-"]
     if len(password) < 8:
@@ -75,7 +76,7 @@ def password_making(password):
         return False
     return True
 
-#@Get Valid Password Function:
+#@ Get Valid Password Function:
 def get_valid_password():
     while True:
         password = input("Enter new password: ")
@@ -83,10 +84,9 @@ def get_valid_password():
             continue
         return password
 
-#@Get Valid Contact Function:
-def get_valid_contact(cred_files=None):
-    if cred_files is None:
-        cred_files = [admin_file_C, staff_file_C, member_file_C]
+#@ Get Valid Contact Function:
+def get_valid_contact():
+    cred_files = [admin_file_C, staff_file_C, member_file_C]
     while True:
         input_contact = input("Enter contact number: ")
         exists = False
@@ -100,9 +100,7 @@ def get_valid_contact(cred_files=None):
                             _, _, stored_contact = parts
                         if input_contact == stored_contact:
                             exists = True
-                            break
-            if exists:
-                break
+                            continue
         if exists:
             print("Contact number already exists. Please enter a different number.")
             continue
@@ -111,7 +109,7 @@ def get_valid_contact(cred_files=None):
             continue
         return input_contact
 
-#@Get Valid Name Function:
+#@ Get Valid Name Function:
 def get_valid_name():
         while True:
             name = input("Enter name: ")
@@ -294,14 +292,6 @@ def password_reset_admin(admin):
                     for line in lines[1:]
                     if len(line.strip().split(',')) == len(headers)
                 ] 
-        with open(admin_file_C, 'r', encoding="utf-8") as file:
-            lines = file.readlines()
-            headers = lines[0].strip().split(',')
-            admin_cred = [
-                    line.strip().split(',')
-                    for line in lines[1:]
-                    if len(line.strip().split(',')) == len(headers)
-                ] 
             selected_admin = input("\nEnter Admin ID to reset password (or type 'cancel' to abort): ").strip()
             admin_index = -1
             for index, line in enumerate(admin_sec):
@@ -313,8 +303,8 @@ def password_reset_admin(admin):
             if admin_index == -1:
                 print("No matching ID found.")
             else:
-                selected_admin = admin_cred[admin_index]
-                confirm = input(f"Are you sure you want to reset password for this admin: {', '.join(selected_admin)}? (y/n): ").lower()
+                selected_admin = admin_sec[admin_index]
+                confirm = input(f"Are you sure you want to reset password for this admin: {selected_admin[0]}? (y/n): ").lower()
                 if confirm != 'y':
                     print("Password Reset Cancelled.")
                     return manage_admin(admin)
@@ -335,23 +325,6 @@ def password_reset_admin(admin):
                         return manage_admin(admin)
                     else:
                         print("Invalid choice. Please try again.")
-#@Verify Admin Password Function:
-def verify_password(stored_id, input_password):
-    try:
-        if os.path.exists(admin_file_P) and os.path.getsize(admin_file_P) > 0:
-            with open(admin_file_P, "r", encoding="utf-8") as file:
-                next(file)
-                for line in file:
-                    stored_id, stored_password, *_ = line.strip().split(',')
-                    if stored_id == stored_id and stored_password == input_password:
-                        return True
-        return False
-    except FileNotFoundError:
-        print("Admin password file not found.")
-        return False
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        return False
 
 #@Reverify Admin Password Function:
 def reverify_password(admin):
@@ -420,11 +393,13 @@ def admin_table():
             ]
             if not admin_data:
                 print("No data to be displayed")
-        headers = (f"|{headers[0]:^10} | {headers[1]:^15} | {headers[2]:^20}|")
+        max_len = [max(len(row[i]) for row in admin_data + [headers]) for i in range(len(headers))]
+        headers = (f"|{headers[0]:^10} | {headers[1]:^{max_len[1]}} | {headers[2]:^20}|")
+        print(len(headers)*"-")
         print(headers)
         print(len(headers)*"-")
         for row in admin_data:
-            print(f"|{row[0]:^10} | {row[1]:^15} | {row[2]:^20}|")
+            print(f"|{row[0]:^10} | {row[1]:^{max_len[1]}} | {row[2]:^20}|")
         print(len(headers)*"-")
     except FileNotFoundError:
         print(f"Error: '{admin_file_C}' file not found.")
@@ -513,11 +488,13 @@ def staff_table():
             ]
             if not staff_data:
                 print("No data to be displayed")
-        headers = (f"|{headers[0]:^10} | {headers[1]:^15} | {headers[2]:^20}|")
+        max_len = [max(len(row[i]) for row in staff_data + [headers]) for i in range(len(headers))]
+        headers = (f"|{headers[0]:^10} | {headers[1]:^{max_len[1]}} | {headers[2]:^20}|")
+        print(len(headers)*"-")
         print(headers)
         print(len(headers)*"-")
         for row in staff_data:
-            print(f"|{row[0]:^10} | {row[1]:^15} | {row[2]:^20}|")
+            print(f"|{row[0]:^10} | {row[1]:^{max_len[1]}} | {row[2]:^20}|")
         print(len(headers)*"-")
     except FileNotFoundError:
         print(f"Error: '{staff_file_C}' file not found.")
@@ -703,7 +680,7 @@ def manage_members(admin):
         elif choice == '2':
             return view_member_logs(admin)
         elif choice == '3':
-            return add_member(admin)
+            return add_member()
         elif choice == '4':
             return remove_member(admin)
         elif choice == '5':
@@ -728,11 +705,14 @@ def member_table():
             ]
         if not member_data:
             print("No data to be displayed")
-        headers = (f"|{headers[0]:^10} | {headers[1]:^15} | {headers[2]:^20}|")
+        max_len = [max(len(row[i]) for row in member_data + [headers]) for i in range(len(headers))]
+        headers = (f"|{headers[0]:^10} | {headers[1]:^{max_len[1]}} | {headers[2]:^20}|")
+        print(len(headers)*"-")
         print(headers)
         print(len(headers)*"-")
         for row in member_data:
-            print(f"|{row[0]:^10} | {row[1]:^15} | {row[2]:^20}|")
+            print(f"|{row[0]:^10} | {row[1]:^{max_len[1]}} | {row[2]:^20}|")
+        print(len(headers)*"-")
     except FileNotFoundError:
         print(f"Error: '{member_file_C}' file not found.")
     except Exception as e:
@@ -908,9 +888,39 @@ def member_id_generator():
 
 #@View Member Logs Function:
 def view_member_logs(admin):
-    while True:
-        print("View Member Logs - Functionality to be implemented")
+    try:
+        print(f"Member Book History:")
+        member_table()
+        selected_member_id = input("Enter Member ID to view book history: ").strip()
+        with open(BookLog, "r", encoding="utf-8") as log_file:
+            lines = log_file.readlines()
+            filtered_log_lines = []
+            headers = lines[0].strip().split(',')
+            BookLog_Data = [
+                line.strip().split(',')
+                for line in lines[1:]
+                if len(line.strip().split(',')) == len(headers)
+                ]
+            if not BookLog_Data:
+                print("No data to be displayed")
+            for row in BookLog_Data:
+                if row[0] == selected_member_id:
+                    filtered_log_lines.append(row)
+            max_length = [max(len(row[i]) for row in filtered_log_lines + [headers]) for i in range(len(headers))]
+            headers = (f"|{headers[0]:^10}|{headers[1]:^10}|{headers[2]:^{max_length[2]+1}}|{headers[3]:^15}|{headers[4]:^15}|{headers[5]:^15}|")
+            print(len(headers)*"-")
+            print(headers)
+            print(len(headers)*"-")
+            for row in filtered_log_lines:
+                print(f"|{row[0]:^10}|{row[1]:^10}|{row[2]:^{max_length[2]+1}}|{row[3]:^15}|{row[4]:^15}|{row[5]:^15}|")
+            print(len(headers)*"-")
         input("Press Enter to continue...")
+        return manage_members(admin)
+    except FileNotFoundError:  
+        print("Error: Book Logs file not found.")
+        return manage_members(admin)
+    except Exception as e:
+        print(f"An unexpected error occurred while viewing book history: {e}")
         return manage_members(admin)
 
 ##################################################################################################
@@ -1472,6 +1482,6 @@ def member_reverify_password(member):
 #@ DO NOT DELETE #@
 def main():
     while True:
-       view_member_book_history(member=('00001', 'Wasd123!', 'Mithril'))
+       main_menu()
 if __name__ == "__main__":
     main()

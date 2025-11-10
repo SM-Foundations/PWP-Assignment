@@ -179,10 +179,9 @@ def manage_admin(admin):
 
 #@ View Admin Functions:
 def view_admin(admin):
-    while True:
-        admin_table()
-        input("Press Enter to continue...")
-        return manage_admin(admin)
+    admin_table()
+    input("Press Enter to continue...")
+    return manage_admin(admin)
 
 #@ Add Admin Function:
 def add_admin(admin):
@@ -447,7 +446,7 @@ def manage_staff(admin):
         print("4. Reset Password")
         print("5. Previous Menu")
         print('6. Logout')
-        choice = input("Enter your choice (1-5): ")
+        choice = input("Enter your choice (1-6): ")
         if choice == '1':
             return view_staff(admin)
         elif choice == '2':
@@ -504,11 +503,10 @@ def staff_table():
 
 #@ View Staff Functions:
 def view_staff(admin):
-    while True:
-        print("View Staff - Functionality to be implemented")
-        staff_table()
-        input("Press Enter to continue...")
-        return manage_staff(admin)
+    print("View Staff")
+    staff_table()
+    input("Press Enter to continue...")
+    return manage_staff(admin)
 
 #@ Add Staff Function: 
 def add_staff(admin):
@@ -677,20 +675,20 @@ def manage_members(admin):
         print('7. Logout')
         choice = input("Enter your choice (1-7): ")
         if choice == '1':
-            return view_members(admin)
+            view_members(admin)
         elif choice == '2':
-            return view_member_logs(admin)
+            view_member_logs(admin)
         elif choice == '3':
-            return add_member()
+            add_member(admin)
         elif choice == '4':
-            return remove_member(admin)
+            remove_member(admin)
         elif choice == '5':
-            return password_reset_member(admin)
+            password_reset_member(admin)
         elif choice == '6':
-            return admin_menu(admin)
+            admin_menu(admin)
         elif choice == '7':
             print("Logging Out")
-            return main_menu()
+            main_menu()
         else:
             print("Invalid choice. Please try again.")
 #@View Members Function:
@@ -720,7 +718,7 @@ def member_table():
         print(f"An unexpected error occurred: {e}")
 
 #@Add Member Function:
-def add_member():
+def add_member(admin):
     try:
         print("Member Registration")
         name = get_valid_name()
@@ -738,23 +736,23 @@ def add_member():
                 file.write("MemberID,Password,Security_Question\n")
         with open(member_file_P, "a", newline="\n", encoding="utf-8") as file:
             file.write(f"{member_id},{password},{security_phrase}\n")
-        view_members()
+        member_table()
         print(f"Member account set successfully for Member ID: {member_id}")
         while True:
             continue_choice = input("Do you want to register another member? (y/n): ").lower()
             if continue_choice == 'y':
-                return add_member()
+                return add_member(admin)
             elif continue_choice == 'n':
-                return manage_members()
+                return manage_members(admin)
     except FileNotFoundError:
         print("Error: Member credential file not found. Please contact system administrator.")
     except Exception as e:
         print(f"An unexpected error occurred during member registration: {e}")
 
 #@Remove Member Function:
-def remove_member():
+def remove_member(admin):
     while True:
-        view_members()
+        member_table()
         with open(member_file_P, 'r', encoding="utf-8") as file:
             lines = file.readlines()
             headers = lines[0].strip().split(',')
@@ -786,7 +784,7 @@ def remove_member():
                 member_index = index
         if selected_member.lower().strip() == 'cancel':
             print("Reset canceled.")
-            return manage_members()
+            return manage_members(admin)
         if member_index == -1:
             print("No matching ID found.")
         else:
@@ -794,7 +792,7 @@ def remove_member():
             confirm = input(f"Are you sure you want to delete this member: {', '.join(selected_member_row)}? (y/n): ").lower()
             if confirm != 'y':
                 print("Deletion canceled.")
-                return manage_members()
+                return manage_members(admin)
             member_cred.pop(member_index_cred)
             member_sec.pop(member_index_sec)
 
@@ -811,14 +809,14 @@ def remove_member():
             while True:
                 continue_choice = input("Do you want to register delete member? (y/n): ").lower()
                 if continue_choice == 'y':
-                    return remove_member()
+                    return remove_member(admin)
                 elif continue_choice == 'n':
-                    return manage_members()
+                    return manage_members(admin)
 
 #@Password Reset Member Function:
-def password_reset_member():
+def password_reset_member(admin):
     while True:
-        view_members()
+        member_table()
         with open(member_file_P, 'r', encoding="utf-8") as file:
             lines = file.readlines()
             headers = lines[0].strip().split(',')
@@ -842,7 +840,7 @@ def password_reset_member():
                     member_index = index
             if selected_member == 'cancel':
                 print("Reset canceled.")
-                return manage_members()
+                return manage_members(admin)
             if member_index == -1:
                 print("No matching ID found.")
             else:
@@ -850,7 +848,7 @@ def password_reset_member():
                 confirm = input(f"Are you sure you want to reset password for this member: {', '.join(selected_member)}? (y/n): ").lower()
                 if confirm != 'y':
                     print("Password Reset Cancelled.")
-                    return manage_members()
+                    return manage_members(admin)
                 new_password = get_valid_password()
                 new_security_phrase = input("Enter a new security phrase: ")
                 member_sec[member_index][1] = new_password
@@ -863,17 +861,16 @@ def password_reset_member():
                 while True:
                     continue_choice = input("Do you want to reset another password? (y/n): ").lower()
                     if continue_choice == 'y':
-                        return password_reset_member()
+                        return password_reset_member(admin)
                     elif continue_choice == 'n':
-                        return manage_members()
+                        return manage_members(admin)
                     else:
                         print("Invalid choice. Please try again.")
 
 def view_members(admin):
-    while True:
-        member_table()
-        input("Press Enter to continue...")
-        return manage_members(admin)
+    member_table()
+    input("Press Enter to continue...")
+    return manage_members(admin)
     
 #@Member ID Generator Function:
 def member_id_generator():
@@ -1001,10 +998,9 @@ def book_id_generator():
 
 #@ View Repository Function:
 def view_repository(admin): 
-    while True:
-        repository_table()
-        input("Press Enter to continue...")
-        return manage_repository(admin)
+    repository_table()
+    input("Press Enter to continue...")
+    return manage_repository(admin)
 
 #@ Add Repository Function:
 def add_repository(admin):
@@ -1401,7 +1397,6 @@ def borrow_book(member):
                         return borrow_book(member)
                     elif continue_choice == 'n':
                         return member_menu(member)
-                    
     except Exception as e:
         print(f"An error occurred while borrowing the book: {e}")
         return member_menu(member)

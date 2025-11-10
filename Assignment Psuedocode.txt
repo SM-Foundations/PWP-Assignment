@@ -176,12 +176,40 @@ Start Function ADMIN_MENU(admin)
             DISPLAY "Invalid choice. Please try again."
 End Function
 ---------------------------------------------------------------------------
+#@ MANAGE_ADMIN Function:
+Start Function MANAGE_ADMIN(admin)
+    Loop forever
+        DISPLAY "Administrator Management"
+        DISPLAY "1. View Admin"
+        DISPLAY "2. Add Admin"
+        DISPLAY "3. Remove Admin"
+        DISPLAY "4. Reset Password"
+        DISPLAY "5. Previous Menu"
+        DISPLAY "6. Logout"
+        Prompt "Enter your choice (1-6): " and read CHOICE
+
+        If CHOICE = "1" Then
+            Call VIEW_ADMIN(admin)
+        Else If CHOICE = "2" Then
+            Call ADD_ADMIN(admin)
+        Else If CHOICE = "3" Then
+            Call REMOVE_ADMIN(admin)
+        Else If CHOICE = "4" Then
+            Call PASSWORD_RESET_ADMIN(admin)
+        Else If CHOICE = "5" Then
+            Call ADMIN_MENU(admin)
+        Else If CHOICE = "6" Then
+            DISPLAY "Logging Out"
+            Call MAIN_MENU()
+        Else
+            DISPLAY "Invalid choice. Please try again."
+End Function
+---------------------------------------------------------------------------
 #@ View Admin Function:
 Start Function VIEW_ADMIN(admin)
-    Loop forever
-        Call ADMIN_TABLE()
-        Prompt "Press Enter to continue..." and wait for user input  
-        RETURN MANAGE_ADMIN(admin)
+    Call ADMIN_TABLE()
+    Prompt "Press Enter to continue..." and wait for user input  
+    RETURN MANAGE_ADMIN(admin)
 End Function
 ---------------------------------------------------------------------------
 #@ Add Admin Function:
@@ -633,7 +661,6 @@ End Function
 ---------------------------------------------------------------------------
 #@ View Staff Functions:
 Start Function VIEW_STAFF(admin)
-    Loop forever
         Call STAFF_TABLE()
         Prompt "Press Enter to continue..." and wait for user input
         MANAGE_STAFF(admin)
@@ -964,10 +991,9 @@ End Function
 ---------------------------------------------------------------------------
 #@ View Repository Function:
 Start Function VIEW_REPOSITORY(admin)
-    Loop forever
-        Call REPOSITORY_TABLE()
-        Prompt "Press Enter to continue..." and wait for user input
-        CALL MANAGE_REPOSITORY(admin)
+    Call REPOSITORY_TABLE()
+    Prompt "Press Enter to continue..." and wait for user input
+    CALL MANAGE_REPOSITORY(admin)
 End Function
 ---------------------------------------------------------------------------
 #@ Add Repository Function:
